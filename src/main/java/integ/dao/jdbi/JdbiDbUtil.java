@@ -1,7 +1,7 @@
-package integ.jdbi.dao;
+package integ.dao.jdbi;
 
-import integ.dao.CaseDao;
-import integ.dao.PersonDao;
+import muni.dao.CaseDao;
+import muni.dao.PersonDao;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.h2.H2DatabasePlugin;
 import org.jdbi.v3.postgres.PostgresPlugin;

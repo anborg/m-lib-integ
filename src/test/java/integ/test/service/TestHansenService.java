@@ -1,8 +1,8 @@
 package integ.test.service;
 
 import access.integ.IntegUtil;
-import mkm.service.SubsystemService;
 import muni.model.Model;
+import muni.service.SubsystemService;
 import muni.util.MockUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

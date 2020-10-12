@@ -1,4 +1,4 @@
-package integ.jdbi.dao;
+package integ.dao.jdbi;
 
 import muni.model.Model;
 import org.jdbi.v3.core.mapper.RowMapper;

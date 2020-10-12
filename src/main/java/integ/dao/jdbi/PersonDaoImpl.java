@@ -1,6 +1,6 @@
-package integ.jdbi.dao;
+package integ.dao.jdbi;
 
-import integ.dao.PersonDao;
+import muni.dao.PersonDao;
 import muni.model.Model;
 import org.jdbi.v3.core.Jdbi;
 

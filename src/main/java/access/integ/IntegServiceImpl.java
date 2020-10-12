@@ -1,15 +1,17 @@
 package access.integ;
-import integ.dao.CaseDao;
-import integ.dao.PersonDao;
-import mkm.service.SubsystemService;
+
+import muni.dao.CaseDao;
+import muni.dao.PersonDao;
 import muni.model.Model;
+import muni.service.SubsystemService;
 import muni.util.MockUtil;
 
 class IntegServiceImpl implements SubsystemService {
 
     PersonDao personDao;
-    CaseDao caseDao ;
-    public IntegServiceImpl(PersonDao persDao, CaseDao caseDao){
+    CaseDao caseDao;
+
+    public IntegServiceImpl(PersonDao persDao, CaseDao caseDao) {
         this.personDao = persDao;
         this.caseDao = caseDao;
     }

@@ -1,6 +1,6 @@
-package integ.jdbi.dao;
+package integ.dao.jdbi;
 
-import integ.dao.CaseDao;
+import muni.dao.CaseDao;
 import org.jdbi.v3.core.Jdbi;
 
 class CaseDaoImpl implements CaseDao {

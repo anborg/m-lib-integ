@@ -2,10 +2,10 @@ package access.integ;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import integ.jdbi.dao.JdbiDbUtil;
-import integ.dao.CaseDao;
-import integ.dao.PersonDao;
-import mkm.service.SubsystemService;
+import integ.dao.jdbi.JdbiDbUtil;
+import muni.dao.CaseDao;
+import muni.dao.PersonDao;
+import muni.service.SubsystemService;
 import org.postgresql.ds.PGSimpleDataSource;
 
 import javax.sql.DataSource;

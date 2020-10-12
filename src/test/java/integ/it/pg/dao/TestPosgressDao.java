@@ -1,11 +1,11 @@
 package integ.it.pg.dao;
 
-import integ.dao.PersonDao;
-import integ.jdbi.dao.JdbiDbUtil;
+import access.integ.IntegUtil;
+import integ.dao.jdbi.JdbiDbUtil;
+import muni.dao.PersonDao;
 import muni.model.Model;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import access.integ.IntegUtil;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public class TestPosgressDao {
     @Test
     public void testDao_CRUD() {
         PersonDao dao = JdbiDbUtil.getDao(IntegUtil.devDatasource(), PersonDao.class);
-        //dao.createTable(); Just for one time.
+        //dao.createTable(); //Just for one time.
         dao.deleteAll();
         List<Model.Person> listShouldBeEmpty = dao.getAll();
         assertThat(listShouldBeEmpty).isEmpty();
