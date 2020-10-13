@@ -2,7 +2,7 @@ package integ.it.pg.dao;
 
 import access.integ.IntegUtil;
 import integ.dao.jdbi.JdbiDbUtil;
-import muni.dao.PersonDao;
+import muni.dao.CRUDDao;
 import muni.model.Model;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ public class TestPosgressDao {
 
     @Test
     public void testDao_CRUD() {
-        PersonDao dao = JdbiDbUtil.getDao(IntegUtil.devDatasource(), PersonDao.class);
+        CRUDDao<Model.Person> dao = JdbiDbUtil.getDao(IntegUtil.devDatasource(), Model.Person.class);
         //dao.createTable(); //Just for one time.
         dao.deleteAll();
         List<Model.Person> listShouldBeEmpty = dao.getAll();
@@ -26,21 +26,21 @@ public class TestPosgressDao {
         final var p1 = Model.Person.newBuilder().setFirstName("Alice").setLastName("Doe").build();
         final var p2 = Model.Person.newBuilder().setFirstName("Clarice").setLastName("Stuck").build();
         final var p3 = Model.Person.newBuilder().setFirstName("Delete").setLastName("Me").build();
-        int id_ofP1 = dao.insert(p1);
-        int id_ofP2 = dao.insert(p2);
-        int id_ofP3 = dao.insert(p3);
+        long id_ofP1 = dao.save(p1);
+        long id_ofP2 = dao.save(p2);
+        long id_ofP3 = dao.save(p3);
         // get
         final var p1_got = dao.get(id_ofP1);
         final var p2_got = dao.get(id_ofP2);
         Assertions.assertThat(p1_got)
-            .extracting(Model.Person::getFirstName, Model.Person::getLastName)
+                .extracting(Model.Person::getFirstName, Model.Person::getLastName)
                 .contains(p1.getFirstName(), p1.getLastName());
         Assertions.assertThat(p2_got)
                 .extracting(Model.Person::getFirstName, Model.Person::getLastName)
                 .contains(p2.getFirstName(), p2.getLastName());
         // update
         final var p2_ToUpdate = Model.Person.newBuilder(p2_got).setLastName("Dummy").build();
-        dao.update(p2_ToUpdate);
+        dao.save(p2_ToUpdate);
         final var p2_Updated = dao.get(id_ofP2);
         //delete
         dao.delete(id_ofP3);

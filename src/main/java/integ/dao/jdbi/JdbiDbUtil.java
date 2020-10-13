@@ -1,7 +1,7 @@
 package integ.dao.jdbi;
 
-import muni.dao.CaseDao;
-import muni.dao.PersonDao;
+import muni.dao.CRUDDao;
+import muni.model.Model;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.h2.H2DatabasePlugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
@@ -47,13 +47,13 @@ public class JdbiDbUtil {
         return jdbi;
     }
 
-    public static <T> T getDao(DataSource ds, Class<T> type) {
+    public static <T> CRUDDao<T> getDao(DataSource ds, Class<T> type) {
         if (!type.isInterface()) throw new RuntimeException("Only interface type expected");
-        if (type.getName() == PersonDao.class.getName()) {
-            return (T) new PersonDaoImpl(withDbPlugin(ds));
+        if (type.getName() == Model.Person.class.getName()) {
+            return (CRUDDao<T>) new PersonDaoImpl(withDbPlugin(ds));
         }
-        if (type.getName() == CaseDao.class.getName()) {
-            return (T) new CaseDaoImpl(withDbPlugin(ds));
+        if (type.getName() == Model.Case.class.getName()) {
+            return (CRUDDao<T>) new CaseDaoImpl(withDbPlugin(ds));
         }
 
         throw new UnsupportedOperationException("Interface not expected" + type.getName());

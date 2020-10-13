@@ -3,8 +3,8 @@ package access.integ;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import integ.dao.jdbi.JdbiDbUtil;
-import muni.dao.CaseDao;
-import muni.dao.PersonDao;
+import muni.dao.CRUDDao;
+import muni.model.Model;
 import muni.service.SubsystemService;
 import org.postgresql.ds.PGSimpleDataSource;
 
@@ -15,12 +15,31 @@ import java.util.Properties;
 
 public class IntegUtil {
 
-    public static SubsystemService dev() {
-        final var ds = devDatasource();
-        PersonDao personDao = JdbiDbUtil.getDao(ds, PersonDao.class);
-        CaseDao caseDao = JdbiDbUtil.getDao(ds, CaseDao.class);
-        return new IntegServiceImpl(personDao, caseDao);
-    }
+    public static final String sql_select_person = "select\n" +
+            "    ip.\"id\",\n" +
+            "    ip.firstname,\n" +
+            "    ip.lastname,\n" +
+            "    ip.email,\n" +
+            "    ip.phone1,\n" +
+            "    ip.phone2,\n" +
+            "    ip.address_id,\n" +
+            "    ip.ts_create,\n" +
+            "    ip.ts_update,\n" +
+            "    --ia.\"id\",\n" +
+            "    ia.streetname,\n" +
+            "    ia.streetnum,\n" +
+            "    ia.city,\n" +
+            "    ia.country,\n" +
+            "    ia.postalcode,\n" +
+            "    ia.lat,\n" +
+            "    ia.lon,\n" +
+            "    ia.ts_create addr_ts_create,\n" +
+            "    ia.ts_update addr_ts_update\n" +
+            "from\n" +
+            "    intg_person ip\n" +
+            "    left join intg_address ia on ip.address_id = ia.id\n" +
+            "where\n" +
+            "    ip.id = :id";
 
     public static DataSource devDatasource() {
         final Properties props = new Properties();
@@ -57,4 +76,41 @@ public class IntegUtil {
 
     }
 
+    public static SubsystemService dev() {
+        final var ds = devDatasource();
+        CRUDDao<Model.Person> personDao = JdbiDbUtil.getDao(ds, Model.Person.class);
+        CRUDDao<Model.Case> caseDao = JdbiDbUtil.getDao(ds, Model.Case.class);
+        return new IntegServiceImpl(personDao, caseDao);
+    }
+
 }
+/*
+
+select
+    ip."id",
+    ip.firstname,
+    ip.lastname,
+    ip.email,
+    ip.phone1,
+    ip.phone2,
+    ip.address_id,
+    ip.ts_create,
+    ip.ts_update,
+    --ia."id",
+    ia.streetname,
+    ia.streetnum,
+    ia.city,
+    ia.country,
+    ia.postalcode,
+    ia.lat,
+    ia.lon,
+    ia.ts_create addr_ts_create,
+    ia.ts_update addr_ts_update
+from
+    intg_person ip
+    left join intg_address ia on ip.address_id = ia.id
+where
+    ip.id = :id
+;
+
+*/

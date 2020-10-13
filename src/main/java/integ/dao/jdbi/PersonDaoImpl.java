@@ -1,63 +1,64 @@
 package integ.dao.jdbi;
 
-import muni.dao.PersonDao;
+import access.integ.IntegUtil;
+import muni.dao.CRUDDao;
 import muni.model.Model;
 import org.jdbi.v3.core.Jdbi;
 
 import java.util.List;
 
-class PersonDaoImpl implements PersonDao {
+@SuppressWarnings("deprecation")
+class PersonDaoImpl implements CRUDDao<Model.Person> {
 
     Jdbi jdbi;
 
-    public PersonDaoImpl(Jdbi jdbi){
+    public PersonDaoImpl(Jdbi jdbi) {
 
-        this.jdbi =jdbi;
+        this.jdbi = jdbi;
+    }
+
+
+    @Override
+    public Model.Person get(long id) {
+        return jdbi.withHandle(h -> {
+            Model.Person p =
+                    h.createQuery(IntegUtil.sql_select_person)
+                            .bind("id", id)
+                            .map(new PersonMapper())
+                            .one();
+            System.out.println(p);
+            return p;
+        });
+//        return jdbi.withExtension(DaoDelegateInterfacePerson.class, dao ->{
+//            return dao.get(id);
+//        });
     }
 
     @Override
-    public Model.Person get(int id) {
-        return jdbi.withExtension(PersonDaoDelegateInterface.class, dao ->{
-            return dao.get(id);
-        });
-    }
-    @Override
-    public int insert(Model.Person in) {
-        return jdbi.withExtension(PersonDaoDelegateInterface.class, dao ->{
-            return dao.insert(in);
-        });
+    public long save(Model.Person in) {
+        return jdbi.withExtension(DaoDelegateInterfacePerson.class, dao -> dao.save(in));
     }
 
-    @Override
-    public void update(Model.Person in) {
-        jdbi.useExtension(PersonDaoDelegateInterface.class, dao ->{
-            dao.update(in);
-        });
-    }
+
 
     @Override
     public List<Model.Person> getAll() {
-        return jdbi.withExtension(PersonDaoDelegateInterface.class, dao ->{
-            return dao.getAll();
-        });
+        return jdbi.withExtension(DaoDelegateInterfacePerson.class, DaoDelegateInterfacePerson::getAll);
     }
 
     @Override
     public void deleteAll(){
-        jdbi.useExtension(PersonDaoDelegateInterface.class, dao ->{
-            dao.deleteAll();
-        });
+        jdbi.useExtension(DaoDelegateInterfacePerson.class, DaoDelegateInterfacePerson::deleteAll);
     }
 
     @Override
-    public void delete(int id) {
-        jdbi.useExtension(PersonDaoDelegateInterface.class, dao ->{
-            dao.delete(Integer.valueOf(id));
-        });
+    public void delete(long id) {
+        jdbi.useExtension(DaoDelegateInterfacePerson.class, dao -> dao.delete(id));
     }
-    public void createTable(){
-        jdbi.useExtension(PersonDaoDelegateInterface.class, dao ->{
-            dao.createTable();
-        });
+
+    public void createTable() {
+        jdbi.useExtension(DaoDelegateInterfacePerson.class, dao -> dao.createTable());
     }
+
+
 }

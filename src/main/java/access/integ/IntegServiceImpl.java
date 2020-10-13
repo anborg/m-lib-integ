@@ -1,40 +1,34 @@
 package access.integ;
 
-import muni.dao.CaseDao;
-import muni.dao.PersonDao;
+import muni.dao.CRUDDao;
 import muni.model.Model;
 import muni.service.SubsystemService;
 import muni.util.MockUtil;
 
 class IntegServiceImpl implements SubsystemService {
 
-    PersonDao personDao;
-    CaseDao caseDao;
+    CRUDDao<Model.Person> personDao;
+    CRUDDao<Model.Case> caseDao;
 
-    public IntegServiceImpl(PersonDao persDao, CaseDao caseDao) {
+    public IntegServiceImpl(CRUDDao<Model.Person> persDao, CRUDDao<Model.Case> caseDao) {
         this.personDao = persDao;
         this.caseDao = caseDao;
     }
 
     @Override //TODO Priority-1
-    public Model.Person createPerson(Model.Person in) {
-        int id = personDao.insert(in);
+    public Model.Person save(Model.Person in) {
+        long id = personDao.save(in);
         return personDao.get(id);
     }
+
     @Override //TODO Priority-2
-    public Model.Case createCase(Model.Case in) {
+    public Model.Case save(Model.Case in) {
         throw new UnsupportedOperationException("Please get it implemented");
-    }
-    @Override
-    public Model.Person getPerson(String id) { // Translate integ: string-id to hansen int-id
-        //
-        return personDao.get(Integer.valueOf(id));
     }
 
     @Override
-    public Model.Person updatePerson(Model.Person in) {
-        personDao.update(in);
-        return personDao.get(Integer.valueOf(in.getId()));
+    public Model.Person getPerson(String id) { // Translate integ: string-id to hansen int-id
+        return personDao.get(Long.valueOf(id));
     }
 
     @Override
@@ -49,11 +43,6 @@ class IntegServiceImpl implements SubsystemService {
 
     @Override
     public Model.PostalAddress createPostalAddress(String s) {
-        return MockUtil.buildAddress();
-    }
-
-    @Override
-    public Model.PostalAddress updatePostalAddress(String s) {
         return MockUtil.buildAddress();
     }
 
