@@ -1,12 +1,13 @@
-SET MODE ORACLE;
+--SET MODE ORACLE;
 CREATE SCHEMA IF NOT EXISTS INTEG;
 set schema integ;
 drop table if exists INTG_PERSON;
-drop TABLE if exists integ.INTEG_PERSON ;
+drop TABLE if exists integ.INTEG_PERSON;
+
 CREATE TABLE integ.INTEG_PERSON (
     id  SERIAL PRIMARY KEY
-    , firstname VARCHAR
-    , lastname VARCHAR
+    , firstname VARCHAR(30)
+    , lastname VARCHAR(30)
     , email VARCHAR(20) -- contact_channels.email
     , phone1 VARCHAR(15) -- contact_channels.phone1
     , phone2 VARCHAR(15)

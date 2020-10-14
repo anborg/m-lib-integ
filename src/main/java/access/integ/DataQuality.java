@@ -55,10 +55,15 @@ public class DataQuality {
         }//isvalidfor-insert
 
         public static boolean isvalidForUpdate(Model.Person in) {
-            if (null != in && in.getId().isEmpty() == false) {// ID must NOT be NULL - preexisting
-                if (in.hasCreateTime() // signal: already created
-                        && in.hasUpdateTime() // signal: already created
-                        && in.getDirty() == true // explict signal to update
+            final var id_is_empty = in.getId().isEmpty();
+            final var has_create_time =in.hasCreateTime();
+            final var has_update_time =in.hasUpdateTime();
+            final var is_dirty = in.getDirty();
+            System.out.println("IsvalidforUpdate: id_is_empty="+id_is_empty+" has_create_time="+has_create_time+" has_update_time="+has_update_time+" is_dirty="+is_dirty);
+            if (null != in &&  id_is_empty == false) {// ID must NOT be NULL - preexisting
+                if (has_create_time ==true // signal: already created
+                        && has_update_time ==true // signal: already created
+                        && is_dirty == true // explict signal to update
                 ) {
                     return true;
                 } else {

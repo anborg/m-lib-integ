@@ -47,7 +47,7 @@ class MapperPerson implements RowMapper<Model.Person> {
             Optional.ofNullable(lat).ifPresent(ab::setLat);
             Optional.ofNullable(lon).ifPresent(ab::setLon);
             Optional.ofNullable(addr_ts_create).ifPresent(t -> ab.setCreateTime(Timestamps.fromSeconds(t.toInstant().getEpochSecond())));
-            Optional.ofNullable(addr_ts_update).ifPresent(t -> ab.setCreateTime(Timestamps.fromSeconds(t.toInstant().getEpochSecond())));
+            Optional.ofNullable(addr_ts_update).ifPresent(t -> ab.setUpdateTime(Timestamps.fromSeconds(t.toInstant().getEpochSecond())));
         }
         //build person
         String id = "" + rs.getInt("id");

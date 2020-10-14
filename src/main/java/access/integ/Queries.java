@@ -1,7 +1,7 @@
 package access.integ;
 
 public interface Queries {
-    String sql_person_select = "select\n" +
+    String sql_person_select_all = "select\n" +
             "    ip.id,\n" +
             "    ip.firstname,\n" +
             "    ip.lastname,\n" +
@@ -23,7 +23,8 @@ public interface Queries {
             "    ia.ts_update addr_ts_update\n" +
             "from\n" +
             "    integ.INTEG_PERSON ip\n" +
-            "    left join integ.integ_address ia on ip.address_id = ia.id\n" +
+            "    left join integ.integ_address ia on ip.address_id = ia.id\n" ;
+    String sql_person_select_byId = sql_person_select_all+
             "where\n" +
             "    ip.id = :id";
 

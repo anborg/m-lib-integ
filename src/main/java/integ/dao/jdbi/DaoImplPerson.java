@@ -22,18 +22,18 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
 
     @Override
     public Optional<Model.Person> get(long id) {
-        return jdbi.withHandle(h -> {
-            Optional<Model.Person> p =
-                    h.createQuery(Queries.sql_person_select)
-                            .bind("id", id)
-                            .map(new MapperPerson())
-                            .findOne();
-            System.out.println(p);
-            return p;
-        });
-//        return jdbi.withExtension(DaoDelegateInterfacePerson.class, dao ->{
-//            return dao.get(id);
+//        return jdbi.withHandle(h -> {
+//            Optional<Model.Person> p =
+//                    h.createQuery(Queries.sql_person_select_byId)
+//                            .bind("id", id)
+//                            .map(new MapperPerson())
+//                            .findOne();
+//            //System.out.println(p);
+//            return p;
 //        });
+        return jdbi.withExtension(JdbiDaoInterface.class, dao ->{
+            return dao.get(id);
+        });
     }
 
     @Override
@@ -45,9 +45,11 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
         boolean isValidForUpdate = DataQuality.Person.isvalidForUpdate(in);
 
         if (isValidForInsert) {
-            return (long) jdbi.withExtension(DaoDelegateInterfacePerson.class, dao -> dao.insert(in.getFirstName(), in.getLastName(), in.getEmail(), in.getPhone1(), in.getPhone2()));
+            //return (long) jdbi.withExtension(DaoDelegateInterfacePerson.class, dao -> dao.insertNoAddress(in.getFirstName(), in.getLastName(), in.getEmail(), in.getPhone1(), in.getPhone2()));
+            return (long) jdbi.withExtension(JdbiDaoInterface.class, dao -> dao.insert(in));
         } else if (isValidForUpdate) {//update
-            return jdbi.withExtension(DaoDelegateInterfacePerson.class, dao -> dao.update(in.getFirstName(), in.getLastName(), in.getEmail(), in.getPhone1(), in.getPhone2(), addrId));
+            return jdbi.withExtension(JdbiDaoInterface.class, dao -> dao.update(in.getId(), in.getFirstName(), in.getLastName(), in.getEmail(), in.getPhone1(), in.getPhone2(), addrId));
+
         } else {
             throw new UnsupportedOperationException("NO DML, why is control coming here? Hint: Did you forget to set dirty? isValidForInsert=" + isValidForInsert + ", isValidForUpdate=" + isValidForUpdate);
         }
@@ -65,12 +67,12 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
         boolean isValidForUpdate = DataQuality.isvalidForUpdate(addrIn);
         if (in.hasAddress()) {
             if (isValidForInsert) {
-                return jdbi.withExtension(DaoDelegateInterfaceAddress.class, dao -> dao.insert(addrIn));
+                return jdbi.withExtension(JdbiDaoInterface.class, dao -> dao.insert(addrIn));
 
             } else if (isValidForUpdate) {
-                return jdbi.withExtension(DaoDelegateInterfaceAddress.class, dao -> dao.update(addrIn));
+                return jdbi.withExtension(JdbiDaoInterface.class, dao -> dao.update(addrIn));
             } else {
-                throw new UnsupportedOperationException("NO DML, why is control coming here? Hint: Did you forget to set dirty? isValidForInsert=" + isValidForInsert + ", isValidForUpdate=" + isValidForUpdate);
+                throw new UnsupportedOperationException("NO DML to act-on. Why is control coming here? Hint: Did you forget to set dirty? isValidForInsert=" + isValidForInsert + ", isValidForUpdate=" + isValidForUpdate);
             }
         }
         return null;
@@ -79,17 +81,17 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
 
     @Override
     public List<Model.Person> getAll() {
-        return jdbi.withExtension(DaoDelegateInterfacePerson.class, DaoDelegateInterfacePerson::getAll);
+        return jdbi.withExtension(JdbiDaoInterface.class, JdbiDaoInterface::getAll);
     }
 
     @Override
     public void deleteAll() {
-        jdbi.useExtension(DaoDelegateInterfacePerson.class, DaoDelegateInterfacePerson::deleteAll);
+        jdbi.useExtension(JdbiDaoInterface.class, JdbiDaoInterface::deleteAll);
     }
 
     @Override
     public void delete(long id) {
-        jdbi.useExtension(DaoDelegateInterfacePerson.class, dao -> dao.delete(id));
+        jdbi.useExtension(JdbiDaoInterface.class, dao -> dao.delete(id));
     }
 
 //    public void createTable() {

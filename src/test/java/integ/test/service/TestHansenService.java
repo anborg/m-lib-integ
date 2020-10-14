@@ -1,5 +1,6 @@
 package integ.test.service;
 
+import access.integ.DataQuality;
 import access.integ.IntegUtil;
 import muni.model.Model;
 import muni.service.SubsystemService;
@@ -15,7 +16,7 @@ public class TestHansenService {
 
     @BeforeEach
     public  void setup(){
-        service = IntegUtil.dev();
+        service = IntegUtil.inMem();
     }
 
     public Model.Person createCustomer(){ // Tests create and get
@@ -25,14 +26,22 @@ public class TestHansenService {
     }
 
     @Test
-    public void updateCustomer(){
-        Model.Person c1_got = createCustomer();
-        final var c1_ToUpdate = Model.Person.newBuilder(c1_got).setLastName("Fork-Updated").build();
+    public void crud_person_noaddr_shouldPass(){
+        Model.Person c1_new = Model.Person.newBuilder().setFirstName("Bob").setLastName("Fork").setEmail("bob@gmail.com").build();
+        //valid?
+        assertThat(DataQuality.Person.isValidForInsert(c1_new)).isTrue();
+        //save
+        Model.Person c1_fromdb = service.save(c1_new);
+
+        //update
+        final var c1_ToUpdate = Model.Person.newBuilder(c1_fromdb).setLastName("Fork-Updated").setDirty(true).build();
+        //valid for update
+        assertThat(DataQuality.Person.isvalidForUpdate(c1_ToUpdate)).isTrue();
         final var c1_Updated = service.save(c1_ToUpdate);
-        //System.out.println("updated: " + c1_Updated);
-        assertThat(c1_Updated).isSameAs(c1_Updated);
-
-
+        //System.out.println("updated: " + c1_Updated); //TODO document soprint is triggering xxCase() NoSuchMethod.
+        //assertThat(c1_Updated).isSameAs(c1_ToUpdate); //TODO document isSameAs is triggering Caused by: java.lang.NoSuchMethodException: muni.model.Model$Person.getCreateTimeCase()
+        assertThat(c1_Updated).extracting(Model.Person::getLastName)
+                .containsExactly(c1_ToUpdate.getLastName());
     }
 
 

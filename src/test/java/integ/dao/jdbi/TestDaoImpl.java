@@ -10,7 +10,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestPersonDaoImpl {
+public class TestDaoImpl {
     CRUDDao<Model.Person> dao = new DaoImplPerson(JdbiDbUtil.withDbPlugin(IntegUtil.inmemDatasource()));
 
     @Test
@@ -19,6 +19,7 @@ public class TestPersonDaoImpl {
         final var p1 = Model.Person.newBuilder().setFirstName("Alice").setLastName("Doe").setEmail("alice@gmail.com").build();
         Long id = dao.save(p1);
         Optional<Model.Person> opt = dao.get(id);
+        assertThat(opt.isPresent()).isTrue();//TODO document, sensitive. if I directly dao.get(id).get() throws exception, But if i use opt.get() it works?! proto3 issue.
         final var p = opt.get();
         assertThat(p).isNotNull();
         assertThat(p)
@@ -42,7 +43,7 @@ public class TestPersonDaoImpl {
         Optional<Model.Person> opt = dao.get(1L);
         assertThat(opt.isPresent()).isFalse();
 //        final var p = opt.get();
-//        //System.out.println(p);
+//        System.out.println(p.toString());
 //        assertThat(p.hasAddress()).isFalse();
     }
 }
