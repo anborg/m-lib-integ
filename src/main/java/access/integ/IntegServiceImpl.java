@@ -23,12 +23,12 @@ class IntegServiceImpl implements SubsystemService {
     @Override //TODO Priority-1
     public Model.Person save(Model.Person in) {
         long id = personDao.save(in);
-        return personDao.get(id).get();//Once saved, assumed "guaranteed" return
+        return personDao.getById(id).get();//Once saved, assumed "guaranteed" return
     }
 
     @Override
     public Optional<Model.Person> getPerson(String id) { // Translate integ: string-id to hansen int-id
-        return personDao.get(Long.valueOf(id));
+        return personDao.getById(Long.valueOf(id));
     }
 
     @Override

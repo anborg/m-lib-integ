@@ -1,11 +1,11 @@
 package integ.dao.jdbi;
 
 import access.integ.DataQuality;
-import access.integ.Queries;
 import muni.dao.CRUDDao;
 import muni.model.Model;
 import org.jdbi.v3.core.Jdbi;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +21,7 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
 
 
     @Override
-    public Optional<Model.Person> get(long id) {
+    public Optional<Model.Person> getById(long id) {
 //        return jdbi.withHandle(h -> {
 //            Optional<Model.Person> p =
 //                    h.createQuery(Queries.sql_person_select_byId)
@@ -32,7 +32,7 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
 //            return p;
 //        });
         return jdbi.withExtension(JdbiDaoInterface.class, dao ->{
-            return dao.get(id);
+            return dao.getPersonById(id);
         });
     }
 
@@ -78,7 +78,14 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
         return null;
     }
 
-
+    @Override
+    public List<Model.Person> findBySample(Model.Person in){
+        return Collections.EMPTY_LIST;
+    }
+    @Override
+    public void setInactive(Model.Person id){
+        //inactivate
+    }
     @Override
     public List<Model.Person> getAll() {
         return jdbi.withExtension(JdbiDaoInterface.class, JdbiDaoInterface::getAll);

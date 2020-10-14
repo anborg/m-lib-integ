@@ -45,14 +45,15 @@ public class TestJdbiDaoInterface {
             long id_ofP2 = dao.insert(p2);
             long id_ofP3 = dao.insert(p3);
             System.out.println(id_ofP1 + ", " + id_ofP2 + ", " + id_ofP3);
-            final Optional<Model.Person> p2Select = dao.get(id_ofP2);
+            final Optional<Model.Person> p2Select = dao.getPersonById(id_ofP2);
             assertThat(p2Select.isPresent()).isTrue();
             final var p2_updated = Model.Person.newBuilder(p2Select.get()).setLastName("Dummy").build();
             long id_p2 = dao.updateNoAddress(p2_updated);
 //          //delete
             dao.delete(id_ofP3);
             //id_ofP1
-            Model.Person p1_fromdb = dao.get(id_ofP1).get();
+            final var optp1_fromdb = dao.getPersonById(id_ofP1);
+            Model.Person p1_fromdb = optp1_fromdb.get(); //TODO unpreditable error
             var p1_addr_fromdb = p1_fromdb.getAddress();
             //verify address
             assertThat(p1_fromdb).isNotNull();
@@ -71,9 +72,6 @@ public class TestJdbiDaoInterface {
             assertThat(p1_fromdb.getId()).containsOnlyDigits();
             assertThat(p1_fromdb.hasCreateTime()).isTrue();
             assertThat(p1_fromdb.hasUpdateTime()).isTrue();
-
-
-
             return dao.getAll();
         });//useExtension
         //then

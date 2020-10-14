@@ -9,6 +9,7 @@ import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,13 +24,14 @@ interface JdbiDaoInterface {//extends CRUDDao<Model.Person>
 
     @Deprecated
     @SqlQuery(Queries.sql_person_select_byId)
-    @RegisterBeanMapper(MapperPerson.class)
-    Optional<Model.Person> get(@Bind("id") long id);
+    @RegisterBeanMapper(MapperPersonWithAddress.class)
+    Optional<Model.Person> getPersonById(@Bind("id") long id);
 
     @GetGeneratedKeys
     @SqlUpdate("insert into integ.INTEG_PERSON(firstname, lastname, email, phone1, phone2) VALUES ( :firstName, :lastName, :email, :phone1, :phone2 )")// RETURNING id
     Long insert(@BindBean Model.Person in);
 
+    @Transactional
     @GetGeneratedKeys
     @SqlUpdate("insert into integ.INTEG_PERSON(firstname, lastname, email, phone1, phone2, address_id) VALUES ( :firstName, :lastName, :email, :phone1, :phone2, :addressId )")// RETURNING id
     Long insert(@BindBean Model.Person in, @Bind("addressId") Long addressId);
@@ -63,9 +65,11 @@ interface JdbiDaoInterface {//extends CRUDDao<Model.Person>
 
 
     //---------------- ADDRESS ----------------------------
+    @Transactional
     @GetGeneratedKeys
     @SqlUpdate("insert into INTEG_ADDRESS (streetnum,streetname,postalcode,city,country,lat,lon) values ( :streetNum,:streetName,:postalCode,:city,:country,:lat,:lon)")
     Long insert(@BindBean Model.PostalAddress in);
+    @Transactional
     @GetGeneratedKeys
     @SqlUpdate("insert into INTEG_ADDRESS (streetnum,streetname,postalcode,city,country,lat,lon) values ( :streetNum,:streetName,:postalCode,:city,:country,:lat,:lon)")
     Long update(@BindBean Model.PostalAddress in);

@@ -1,0 +1,109 @@
+Issue:
+
+ Model.Person p1_fromdb = dao.getPersonById(id_ofP1).get(); //TODO unpreditable error
+
+Change:
+final var optp1_fromdb = dao.getPersonById(id_ofP1);
+Model.Person p1_fromdb = optp1_fromdb.get(); //TODO unpreditable error
+
+
+Oct 14, 2020 3:09:31 PM com.zaxxer.hikari.HikariDataSource <init>
+INFO: HikariPool-6 - Starting...
+Oct 14, 2020 3:09:31 PM com.zaxxer.hikari.HikariDataSource <init>
+INFO: HikariPool-6 - Start completed.
+dbproductname=H2
+Addr id id_ofP1_a1=1
+
+Oct 14, 2020 3:09:31 PM org.junit.platform.launcher.core.TestExecutionListenerRegistry lambda$notifyEach$1
+WARNING: TestExecutionListener [com.intellij.junit5.JUnit5TestExecutionListener] threw exception for method: executionFinished(TestIdentifier [uniqueId = '[engine:junit-jupiter]/[class:integ.dao.jdbi.TestJdbiDaoInterface]/[method:testDao_CRUD()]', parentId = '[engine:junit-jupiter]/[class:integ.dao.jdbi.TestJdbiDaoInterface]', displayName = 'testDao_CRUD()', legacyReportingName = 'testDao_CRUD()', source = MethodSource [className = 'integ.dao.jdbi.TestJdbiDaoInterface', methodName = 'testDao_CRUD', methodParameterTypes = ''], tags = [], type = TEST], TestExecutionResult [status = FAILED, throwable = org.jdbi.v3.core.statement.UnableToCreateStatementException@4bd2f0dc])
+java.lang.RuntimeException: Generated message class "muni.model.Model$Person" missing method "getCreateTimeCase".
+	at com.google.protobuf.GeneratedMessageV3.getMethodOrDie(GeneratedMessageV3.java:1847)
+	at com.google.protobuf.GeneratedMessageV3.access$1000(GeneratedMessageV3.java:79)
+	at com.google.protobuf.GeneratedMessageV3$FieldAccessorTable$SingularFieldAccessor$ReflectionInvoker.<init>(GeneratedMessageV3.java:2164)
+	at com.google.protobuf.GeneratedMessageV3$FieldAccessorTable$SingularFieldAccessor.<init>(GeneratedMessageV3.java:2222)
+	at com.google.protobuf.GeneratedMessageV3$FieldAccessorTable$SingularMessageFieldAccessor.<init>(GeneratedMessageV3.java:2933)
+	at com.google.protobuf.GeneratedMessageV3$FieldAccessorTable.ensureFieldAccessorsInitialized(GeneratedMessageV3.java:1969)
+	at muni.model.Model$Person.internalGetFieldAccessorTable(Model.java:344)
+	at com.google.protobuf.GeneratedMessageV3.getDescriptorForType(GeneratedMessageV3.java:133)
+	at com.google.protobuf.TextFormat$Printer.print(TextFormat.java:344)
+	at com.google.protobuf.TextFormat$Printer.print(TextFormat.java:334)
+	at com.google.protobuf.TextFormat$Printer.printToString(TextFormat.java:519)
+	at com.google.protobuf.AbstractMessage.toString(AbstractMessage.java:111)
+	at java.base/java.lang.String.valueOf(String.java:2951)
+	at java.base/java.lang.StringBuilder.append(StringBuilder.java:168)
+	at org.jdbi.v3.core.argument.internal.PojoPropertyArguments.toString(PojoPropertyArguments.java:68)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:195)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(ReduceOps.java:913)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.collect(ReferencePipeline.java:578)
+	at org.jdbi.v3.core.statement.Binding.toString(Binding.java:165)
+	at org.jdbi.v3.core.statement.StatementExceptions$MessageRendering$3.render(StatementExceptions.java:109)
+	at org.jdbi.v3.core.statement.StatementExceptions$MessageRendering.apply(StatementExceptions.java:134)
+	at org.jdbi.v3.core.statement.StatementException.getMessage(StatementException.java:72)
+	at java.base/java.lang.Throwable.getLocalizedMessage(Throwable.java:396)
+	at java.base/java.lang.Throwable.toString(Throwable.java:485)
+	at java.base/java.lang.String.valueOf(String.java:2951)
+	at java.base/java.io.PrintWriter.println(PrintWriter.java:837)
+	at java.base/java.lang.Throwable$WrappedPrintWriter.println(Throwable.java:768)
+	at java.base/java.lang.Throwable.printStackTrace(Throwable.java:659)
+	at java.base/java.lang.Throwable.printStackTrace(Throwable.java:725)
+	at com.intellij.junit5.JUnit5TestExecutionListener.getTrace(JUnit5TestExecutionListener.java:307)
+	at com.intellij.junit5.JUnit5TestExecutionListener.testFailure(JUnit5TestExecutionListener.java:292)
+	at com.intellij.junit5.JUnit5TestExecutionListener.testFailure(JUnit5TestExecutionListener.java:248)
+	at com.intellij.junit5.JUnit5TestExecutionListener.executionFinished(JUnit5TestExecutionListener.java:186)
+	at com.intellij.junit5.JUnit5TestExecutionListener.executionFinished(JUnit5TestExecutionListener.java:174)
+	at org.junit.platform.launcher.core.TestExecutionListenerRegistry$CompositeTestExecutionListener.lambda$executionFinished$10(TestExecutionListenerRegistry.java:109)
+	at org.junit.platform.launcher.core.TestExecutionListenerRegistry.lambda$notifyEach$1(TestExecutionListenerRegistry.java:67)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1540)
+	at org.junit.platform.launcher.core.TestExecutionListenerRegistry.notifyEach(TestExecutionListenerRegistry.java:65)
+	at org.junit.platform.launcher.core.TestExecutionListenerRegistry.access$200(TestExecutionListenerRegistry.java:32)
+	at org.junit.platform.launcher.core.TestExecutionListenerRegistry$CompositeTestExecutionListener.executionFinished(TestExecutionListenerRegistry.java:108)
+	at org.junit.platform.launcher.core.ExecutionListenerAdapter.executionFinished(ExecutionListenerAdapter.java:56)
+	at org.junit.platform.launcher.core.DelegatingEngineExecutionListener.executionFinished(DelegatingEngineExecutionListener.java:46)
+	at org.junit.platform.launcher.core.OutcomeDelayingEngineExecutionListener.executionFinished(OutcomeDelayingEngineExecutionListener.java:63)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.reportCompletion(NodeTestTask.java:183)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:89)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1540)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:38)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$7(NodeTestTask.java:129)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:127)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:126)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1540)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:38)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$7(NodeTestTask.java:129)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:127)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:126)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:84)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:32)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:51)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:96)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:75)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:69)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:33)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:230)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:58)
+Caused by: java.lang.NoSuchMethodException: muni.model.Model$Person.getCreateTimeCase()
+	at java.base/java.lang.Class.getMethod(Class.java:2109)
+	at com.google.protobuf.GeneratedMessageV3.getMethodOrDie(GeneratedMessageV3.java:1844)
+	... 82 more
+
+
+Process finished with exit code 0

@@ -14,14 +14,25 @@ class DaoImplCase implements CRUDDao<Model.Case> {
         this.jdbi = jdbi;
     }
 
-    @Override
-    public Optional<Model.Case> get(long l) {
-        return Optional.empty();
-    }
 
     @Override
     public Long save(Model.Case aCase) {
         return null;
+    }
+
+    @Override
+    public Optional<Model.Case> getById(long l) {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<Model.Case> findBySample(Model.Case aCase) {
+        return null;
+    }
+
+    @Override
+    public void setInactive(Model.Case aCase) {
+
     }
 
     @Override

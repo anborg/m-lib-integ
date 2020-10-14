@@ -15,7 +15,7 @@ public class JdbiDbUtil {
     private static void common(Jdbi jdbi) {
         jdbi.installPlugin(new SqlObjectPlugin())
                 //common mappers
-                .registerRowMapper(new MapperPerson());
+                .registerRowMapper(new MapperPersonWithAddress());
     }
 
     public static Jdbi withDbPlugin(DataSource ds) {

@@ -18,7 +18,7 @@ public class TestPersonDaoImpl {
 
     @Test
     public void testDao_CRUD() {
-        CRUDDao<Model.Person> dao = JdbiDbUtil.getDao(IntegUtil.devDatasource(), Model.Person.class);
+        CRUDDao<Model.Person> dao = JdbiDbUtil.getDao(IntegUtil.inmemDatasource(), Model.Person.class);
         //dao.createTable(); //Just for one time.
         dao.deleteAll();
         List<Model.Person> listShouldBeEmpty = dao.getAll();
@@ -32,8 +32,8 @@ public class TestPersonDaoImpl {
         Long id_ofP3 = dao.save(p3);
         System.out.println(id_ofP1 + ", " + id_ofP2 + ", " + id_ofP3);
         // get
-        final var p1_got = dao.get(id_ofP1).get();
-        final var p2_got = dao.get(id_ofP2).get();
+        final var p1_got = dao.getById(id_ofP1).get();
+        final var p2_got = dao.getById(id_ofP2).get();
         Assertions.assertThat(p1_got)
                 .extracting(Model.Person::getFirstName, Model.Person::getLastName)
                 .contains(p1.getFirstName(), p1.getLastName());
@@ -43,7 +43,7 @@ public class TestPersonDaoImpl {
         // update
         final var p2_ToUpdate = Model.Person.newBuilder(p2_got).setLastName("Stuck-Updated").setDirty(true).build();
         dao.save(p2_ToUpdate);
-        final var p2_Updated = dao.get(id_ofP2).get();
+        final var p2_Updated = dao.getById(id_ofP2).get();
         //delete
         dao.delete(id_ofP3);
         assertThat(p2_Updated)

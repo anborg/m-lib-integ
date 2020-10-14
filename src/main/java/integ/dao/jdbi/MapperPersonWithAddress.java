@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 //mapper -- THe order of building may need to follow this standard pattern.
-class MapperPerson implements RowMapper<Model.Person> {
+class MapperPersonWithAddress implements RowMapper<Model.Person> {
     @Override
     public Model.Person map(ResultSet rs, StatementContext ctx) throws SQLException {
         Timestamp ts = Timestamps.fromSeconds(rs.getTimestamp("ts_create").toInstant().getEpochSecond());

@@ -12,12 +12,20 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.Random;
 
 public class IntegUtil {
-    public static final String INMEM_DB_URL = "jdbc:h2:mem:test;" +
-            "INIT=RUNSCRIPT FROM 'classpath:h2/schema.sql'\\;" +
-            "RUNSCRIPT FROM 'classpath:h2/data.sql'";
+//    public static final String INMEM_DB_URL = "jdbc:h2:mem:test;" +
+//            "INIT=RUNSCRIPT FROM 'classpath:h2/schema.sql'\\;" +
+//            "RUNSCRIPT FROM 'classpath:h2/data.sql'";
+    public static String getRandInMemoryDbUrl(){
+        String INMEM_DB_URL = "jdbc:h2:mem:test"+random.nextInt(1000)+";"+
+        "INIT=RUNSCRIPT FROM 'classpath:h2/schema.sql'\\;" +
+                "RUNSCRIPT FROM 'classpath:h2/data.sql'";
+        return INMEM_DB_URL;
+    }
 
+    final static Random random = new Random();
 
     public static DataSource devDatasource() {
         final Properties props = new Properties();
@@ -54,7 +62,7 @@ public class IntegUtil {
         final Properties props = new Properties();
         org.h2.jdbcx.JdbcDataSource ds = null;
         ds = new org.h2.jdbcx.JdbcDataSource();
-        ds.setURL(INMEM_DB_URL);
+        ds.setURL(getRandInMemoryDbUrl());
         ds.setUser("sa");
         ds.setPassword("");
         HikariConfig hc = new HikariConfig();
