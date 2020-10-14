@@ -4,36 +4,38 @@ import muni.dao.CRUDDao;
 import muni.model.Model;
 import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
+import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.locator.UseClasspathSqlLocator;
+import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.util.List;
 
-@RegisterBeanMapper(PersonMapper.class)
+@RegisterBeanMapper(MapperPerson.class)
 @UseClasspathSqlLocator
 interface DaoDelegateInterfaceAddress extends CRUDDao<Model.PostalAddress> {
 
-//    @GetGeneratedKeys
-//    @SqlUpdate("INSERT INTO integ.INTG_person(firstname, lastname, email, phone1, phone2, addr_id) VALUES ( :firstName, :lastName, :contacts)")
-//    int insert(@BindBean Model.Person person);
-//
-//    @SqlUpdate("update integ.INTG_person set firstname = :firstName, lastname = :lastName where id = cast(:id as INTEGER )")
-//    void update(@BindBean Model.Person person);
-//
-//    @SqlQuery("select * from integ.INTG_person where id = :id")
-//    @RegisterBeanMapper(PersonMapper.class)
-//    Model.Person get(@Bind("id")int id);
+    @GetGeneratedKeys
+    @SqlUpdate("insert into INTEG_ADDRESS (streetnum,streetname,postalcode,city,country,lat,lon) values ( :streetnum,:streetname,:postalcode,:city,:country,:lat,:lon)")
+    Long insert(@BindBean Model.PostalAddress in);
+
+    @SqlUpdate("update integ.INTEG_ADDRESS set streetnum=:streetnum   streetname=:streetname,postalcode=:postalcode,city=:city,country=:country,lat=:lat,lon=:lon where id = cast(:id as INTEGER)")
+    Long update(@BindBean Model.PostalAddress in);
+
+    @SqlQuery("select * from INTEG_ADDRESS where id = :id")
+    @RegisterBeanMapper(MapperAddress.class)
+    Model.PostalAddress get(@Bind("id") int id);
 
     @Deprecated
-    @SqlQuery("select * from integ.INTG_ADDRESS ")
+    @SqlQuery("select * from INTEG_ADDRESS ")
     List<Model.PostalAddress> getAll();
 
     @Deprecated
-    @SqlUpdate("delete from integ.INTG_person")
+    @SqlUpdate("delete from INTEG_ADDRESS")
     void deleteAll();
 
     @Deprecated
-    @SqlUpdate("delete from integ.INTG_person where id = cast(:id as INTEGER )")
+    @SqlUpdate("delete from integ.INTEG_ADDRESS where id = cast(:id as INTEGER )")
     void delete(@Bind("id") int id);
 }//Dao

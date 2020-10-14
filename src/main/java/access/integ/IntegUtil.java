@@ -14,32 +14,10 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class IntegUtil {
+    public static final String INMEM_DB_URL = "jdbc:h2:mem:test;" +
+            "INIT=RUNSCRIPT FROM 'classpath:h2/schema.sql'\\;" +
+            "RUNSCRIPT FROM 'classpath:h2/data.sql'";
 
-    public static final String sql_select_person = "select\n" +
-            "    ip.\"id\",\n" +
-            "    ip.firstname,\n" +
-            "    ip.lastname,\n" +
-            "    ip.email,\n" +
-            "    ip.phone1,\n" +
-            "    ip.phone2,\n" +
-            "    ip.address_id,\n" +
-            "    ip.ts_create,\n" +
-            "    ip.ts_update,\n" +
-            "    --ia.\"id\",\n" +
-            "    ia.streetname,\n" +
-            "    ia.streetnum,\n" +
-            "    ia.city,\n" +
-            "    ia.country,\n" +
-            "    ia.postalcode,\n" +
-            "    ia.lat,\n" +
-            "    ia.lon,\n" +
-            "    ia.ts_create addr_ts_create,\n" +
-            "    ia.ts_update addr_ts_update\n" +
-            "from\n" +
-            "    intg_person ip\n" +
-            "    left join intg_address ia on ip.address_id = ia.id\n" +
-            "where\n" +
-            "    ip.id = :id";
 
     public static DataSource devDatasource() {
         final Properties props = new Properties();
@@ -72,8 +50,25 @@ public class IntegUtil {
         return hdc;
     }
 
-    private static class Dummy {
+    public static DataSource inmemDatasource() {
+        final Properties props = new Properties();
+        org.h2.jdbcx.JdbcDataSource ds = null;
+        ds = new org.h2.jdbcx.JdbcDataSource();
+        ds.setURL(INMEM_DB_URL);
+        ds.setUser("sa");
+        ds.setPassword("");
+        HikariConfig hc = new HikariConfig();
+        hc.setDataSource(ds);
+        hc.setMaximumPoolSize(2);
+        HikariDataSource hdc = new HikariDataSource(hc);
+        return hdc;
+    }
 
+    public static SubsystemService inMem() {
+        final var ds = inmemDatasource();
+        CRUDDao<Model.Person> personDao = JdbiDbUtil.getDao(ds, Model.Person.class);
+        CRUDDao<Model.Case> caseDao = JdbiDbUtil.getDao(ds, Model.Case.class);
+        return new IntegServiceImpl(personDao, caseDao);
     }
 
     public static SubsystemService dev() {
@@ -83,34 +78,7 @@ public class IntegUtil {
         return new IntegServiceImpl(personDao, caseDao);
     }
 
+    private static class Dummy {/*for prop file load*/
+    }
+
 }
-/*
-
-select
-    ip."id",
-    ip.firstname,
-    ip.lastname,
-    ip.email,
-    ip.phone1,
-    ip.phone2,
-    ip.address_id,
-    ip.ts_create,
-    ip.ts_update,
-    --ia."id",
-    ia.streetname,
-    ia.streetnum,
-    ia.city,
-    ia.country,
-    ia.postalcode,
-    ia.lat,
-    ia.lon,
-    ia.ts_create addr_ts_create,
-    ia.ts_update addr_ts_update
-from
-    intg_person ip
-    left join intg_address ia on ip.address_id = ia.id
-where
-    ip.id = :id
-;
-
-*/

@@ -1,5 +1,6 @@
 package integ.dao.jdbi;
 
+import access.integ.IntegUtil;
 import muni.model.Model;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
@@ -13,14 +14,12 @@ import static org.assertj.core.api.Assertions.tuple;
 @SuppressWarnings("deprecation")
 public class TestDaoDelegateInterfacePerson {
 
-    String url2 = "jdbc:h2:mem:test;" +
-            "INIT=RUNSCRIPT FROM 'classpath:h2/schema.sql'\\;" +
-            "RUNSCRIPT FROM 'classpath:h2/data.sql'";
+
     String url3 = "jdbc:h2:mem:testdb;INIT=CREATE SCHEMA IF NOT EXISTS INTEG\\;SET SCHEMA INTEG\\;";
 
     public Jdbi buildJdbi() {
-        Jdbi jdbi = Jdbi.create(url2);
-        jdbi.registerRowMapper(new PersonMapper());
+        Jdbi jdbi = Jdbi.create(IntegUtil.INMEM_DB_URL);
+        jdbi.registerRowMapper(new MapperPerson());
         jdbi.installPlugin(new SqlObjectPlugin());
         jdbi.useHandle(handle -> {
             handle.execute("CREATE TABLE integ.HSNMOCK_person (id INTEGER PRIMARY KEY, firstname VARCHAR, lastname VARCHAR)");
@@ -32,14 +31,12 @@ public class TestDaoDelegateInterfacePerson {
     @Test
     public void testDao_CRUD() {
         final var p1 = Model.Person.newBuilder().setFirstName("Alice").setLastName("Doe")
-                .setContactChannels(Model.ContactChannels.newBuilder()
-                        .setEmail(Model.Email.newBuilder().setValue("me@gmail.com").build())//To PERSON table
-                        .setPhone1(Model.Phone.newBuilder().setNumber(12345678).build())//To PERSON table
-                        .setPhone2(Model.Phone.newBuilder().setNumber(12345678).build())//To PERSON table
-                        //To ADDRES table
-                        .setPostalAddress(Model.PostalAddress.newBuilder().setStreetNum("111").setStreetName("My street").setCity("Avenly").setPostalCode("L1L0Z0").build())
-                        .build()//ContactChannels
-                ).build();
+                .setEmail("me@gmail.com")//To PERSON table
+                .setPhone1("12345678")//To PERSON table
+                .setPhone2("12345678")//To PERSON table
+                //To ADDRES table
+                .setAddress(Model.PostalAddress.newBuilder().setStreetNum("111").setStreetName("My street").setCity("Avenly").setPostalCode("L1L0Z0").build())
+                .build();
         final var p2 = Model.Person.newBuilder().setFirstName("Clarice").setLastName("Stuck").build();
         final var p3 = Model.Person.newBuilder().setFirstName("Delete").setLastName("Me").build();
         Jdbi jdbi = buildJdbi();

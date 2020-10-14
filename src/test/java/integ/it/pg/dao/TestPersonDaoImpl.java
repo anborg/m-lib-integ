@@ -11,27 +11,27 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings("deprecation")
-public class TestPosgressDao {
-
+public class TestPersonDaoImpl {
 
 
     @Test
     public void testDao_CRUD() {
-        CRUDDao<Model.Person> dao = JdbiDbUtil.getDao(IntegUtil.devDatasource(), Model.Person.class);
+        CRUDDao<Model.Person> dao = JdbiDbUtil.getDao(IntegUtil.inmemDatasource(), Model.Person.class);
         //dao.createTable(); //Just for one time.
         dao.deleteAll();
         List<Model.Person> listShouldBeEmpty = dao.getAll();
         assertThat(listShouldBeEmpty).isEmpty();
         // insert
-        final var p1 = Model.Person.newBuilder().setFirstName("Alice").setLastName("Doe").build();
-        final var p2 = Model.Person.newBuilder().setFirstName("Clarice").setLastName("Stuck").build();
-        final var p3 = Model.Person.newBuilder().setFirstName("Delete").setLastName("Me").build();
-        long id_ofP1 = dao.save(p1);
-        long id_ofP2 = dao.save(p2);
-        long id_ofP3 = dao.save(p3);
+        final var p1 = Model.Person.newBuilder().setFirstName("Alice").setLastName("Doe").setEmail("alice@gmail.com").build();
+        final var p2 = Model.Person.newBuilder().setFirstName("Clarice").setLastName("Stuck").setEmail("clarice@gmail.com").build();
+        final var p3 = Model.Person.newBuilder().setFirstName("Delete").setLastName("Me").setEmail("delete@gmail.com").build();
+        Long id_ofP1 = dao.save(p1);
+        Long id_ofP2 = dao.save(p2);
+        Long id_ofP3 = dao.save(p3);
+        System.out.println(id_ofP1 + ", " + id_ofP2 + ", " + id_ofP3);
         // get
-        final var p1_got = dao.get(id_ofP1);
-        final var p2_got = dao.get(id_ofP2);
+        final var p1_got = dao.get(id_ofP1).get();
+        final var p2_got = dao.get(id_ofP2).get();
         Assertions.assertThat(p1_got)
                 .extracting(Model.Person::getFirstName, Model.Person::getLastName)
                 .contains(p1.getFirstName(), p1.getLastName());
@@ -41,7 +41,7 @@ public class TestPosgressDao {
         // update
         final var p2_ToUpdate = Model.Person.newBuilder(p2_got).setLastName("Dummy").build();
         dao.save(p2_ToUpdate);
-        final var p2_Updated = dao.get(id_ofP2);
+        final var p2_Updated = dao.get(id_ofP2).get();
         //delete
         dao.delete(id_ofP3);
         assertThat(p2_Updated)

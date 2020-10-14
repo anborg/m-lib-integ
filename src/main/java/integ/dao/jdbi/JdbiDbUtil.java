@@ -15,7 +15,7 @@ public class JdbiDbUtil {
     private static void common(Jdbi jdbi) {
         jdbi.installPlugin(new SqlObjectPlugin())
                 //common mappers
-                .registerRowMapper(new PersonMapper());
+                .registerRowMapper(new MapperPerson());
     }
 
     public static Jdbi withDbPlugin(DataSource ds) {
@@ -34,7 +34,7 @@ public class JdbiDbUtil {
                     break;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         common(jdbi);
         return jdbi;
@@ -48,12 +48,12 @@ public class JdbiDbUtil {
     }
 
     public static <T> CRUDDao<T> getDao(DataSource ds, Class<T> type) {
-        if (!type.isInterface()) throw new RuntimeException("Only interface type expected");
+        //if (!type.isInterface()) throw new RuntimeException("Only interface type expected");
         if (type.getName() == Model.Person.class.getName()) {
-            return (CRUDDao<T>) new PersonDaoImpl(withDbPlugin(ds));
+            return (CRUDDao<T>) new DaoImplPerson(withDbPlugin(ds));
         }
         if (type.getName() == Model.Case.class.getName()) {
-            return (CRUDDao<T>) new CaseDaoImpl(withDbPlugin(ds));
+            return (CRUDDao<T>) new DaoImplCase(withDbPlugin(ds));
         }
 
         throw new UnsupportedOperationException("Interface not expected" + type.getName());
