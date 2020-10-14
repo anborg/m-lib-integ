@@ -1,6 +1,6 @@
 package integ.dao.jdbi;
 
-import access.integ.DataQuality;
+import muni.util.DataQuality;
 import muni.dao.CRUDDao;
 import muni.model.Model;
 import org.jdbi.v3.core.Jdbi;
@@ -42,7 +42,7 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
         Long addrId = handleAddress(in);
 
         boolean isValidForInsert = DataQuality.Person.isValidForInsert(in);
-        boolean isValidForUpdate = DataQuality.Person.isvalidForUpdate(in);
+        boolean isValidForUpdate = DataQuality.Person.isValidForUpdate(in);
 
         if (isValidForInsert) {
             //return (long) jdbi.withExtension(DaoDelegateInterfacePerson.class, dao -> dao.insertNoAddress(in.getFirstName(), in.getLastName(), in.getEmail(), in.getPhone1(), in.getPhone2()));
@@ -63,8 +63,8 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
             System.out.println("No Address to insert");
             return null;
         }
-        boolean isValidForInsert = DataQuality.isValidForInsert(addrIn);
-        boolean isValidForUpdate = DataQuality.isvalidForUpdate(addrIn);
+        boolean isValidForInsert = DataQuality.Address.isValidForInsert(addrIn);
+        boolean isValidForUpdate = DataQuality.Address.isValidForUpdate(addrIn);
         if (in.hasAddress()) {
             if (isValidForInsert) {
                 return jdbi.withExtension(JdbiDaoInterface.class, dao -> dao.insert(addrIn));
