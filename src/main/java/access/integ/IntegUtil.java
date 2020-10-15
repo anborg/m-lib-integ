@@ -18,10 +18,14 @@ public class IntegUtil {
 //    public static final String INMEM_DB_URL = "jdbc:h2:mem:test;" +
 //            "INIT=RUNSCRIPT FROM 'classpath:h2/schema.sql'\\;" +
 //            "RUNSCRIPT FROM 'classpath:h2/data.sql'";
-    public static String getRandInMemoryDbUrl(){
-        String INMEM_DB_URL = "jdbc:h2:mem:test"+random.nextInt(1000)+";"+
+
+
+    public static String inmemDbUrl_anon_one_connection(){
+        String INMEM_DB_URL = "jdbc:h2:mem:;"+
         "INIT=RUNSCRIPT FROM 'classpath:h2/schema.sql'\\;" +
                 "RUNSCRIPT FROM 'classpath:h2/data.sql'";
+
+
         return INMEM_DB_URL;
     }
 
@@ -62,7 +66,7 @@ public class IntegUtil {
         final Properties props = new Properties();
         org.h2.jdbcx.JdbcDataSource ds = null;
         ds = new org.h2.jdbcx.JdbcDataSource();
-        ds.setURL(getRandInMemoryDbUrl());
+        ds.setURL(inmemDbUrl_anon_one_connection());
         ds.setUser("sa");
         ds.setPassword("");
         HikariConfig hc = new HikariConfig();
