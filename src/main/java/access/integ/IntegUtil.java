@@ -22,8 +22,8 @@ public class IntegUtil {
 
     public static String inmemDbUrl_anon_one_connection(){
         String INMEM_DB_URL = "jdbc:h2:mem:;"+
-        "INIT=RUNSCRIPT FROM 'classpath:h2/schema.sql'\\;" +
-                "RUNSCRIPT FROM 'classpath:h2/data.sql'";
+        "INIT=RUNSCRIPT FROM 'classpath:integ/schema.sql'\\;" +
+                "RUNSCRIPT FROM 'classpath:integ/data.sql'";
 
 
         return INMEM_DB_URL;

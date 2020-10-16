@@ -13,7 +13,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-//@RegisterBeanMapper(MapperPerson.class)
+//@RegisterBeanMapper(MapperPersonWithAddress.class) //DO NOT ADD mapper at class level. Add at method level //TODO make note.
 interface JdbiDaoInterface {//extends CRUDDao<Model.Person>
 
     @Deprecated

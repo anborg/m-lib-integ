@@ -28,7 +28,10 @@ class IntegServiceImpl implements SubsystemService {
 
     @Override
     public Optional<Model.Person> getPerson(String id) { // Translate integ: string-id to hansen int-id
-        return personDao.getById(Long.valueOf(id));
+        System.out.println("At integServiceImpl person id=" +id);
+        Optional<Model.Person> out = personDao.getById(Long.valueOf(id));
+        System.out.println("At integServiceImpl pers=" +out);
+        return out;
     }
 
     @Override

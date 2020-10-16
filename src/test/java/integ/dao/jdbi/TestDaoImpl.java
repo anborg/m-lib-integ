@@ -40,6 +40,7 @@ public class TestDaoImpl {
     @Test
     public void get_nonexistant_person() {
         Optional<Model.Person> opt = dao.getById(9999L);
+        System.out.println(opt);
         assertThat(opt.isPresent()).isFalse();
     }
 

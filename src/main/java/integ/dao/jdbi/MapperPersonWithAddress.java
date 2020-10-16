@@ -19,8 +19,9 @@ class MapperPersonWithAddress implements RowMapper<Model.Person> {
         Model.Person.Builder pb = Model.Person.newBuilder();
 
         final Model.PostalAddress.Builder ab = Model.PostalAddress.newBuilder();
-
-
+        String id = "" + rs.getInt("id");
+        System.out.println("Retrieved person id : " + id);
+        if(null == id) return null;//TODO make not of this nul return.
         //build address
         String address_id = rs.getString("address_id");
 
@@ -50,7 +51,7 @@ class MapperPersonWithAddress implements RowMapper<Model.Person> {
             Optional.ofNullable(addr_ts_update).ifPresent(t -> ab.setUpdateTime(Timestamps.fromSeconds(t.toInstant().getEpochSecond())));
         }
         //build person
-        String id = "" + rs.getInt("id");
+
         String firstName = rs.getString("firstname");
         String lastName = rs.getString("lastname");
         String email = rs.getString("email");
