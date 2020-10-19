@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 @SuppressWarnings("deprecation")
-public class TestJdbiDaoInterface {
+public class TestJdbiDao {
 
 
 //    String url3 = "jdbc:h2:mem:testdb;INIT=CREATE SCHEMA IF NOT EXISTS INTEG\\;SET SCHEMA INTEG\\;";
@@ -36,26 +36,29 @@ public class TestJdbiDaoInterface {
         final var p3 = Model.Person.newBuilder().setFirstName("Delete").setLastName("Me").setEmail("me@gmail.com").build();
         Jdbi jdbi = buildJdbi();
         //start clean
-        jdbi.useExtension(JdbiDaoInterface.class, dao -> dao.deleteAll());
+        jdbi.useExtension(JdbiDao.person.class, dao -> dao.deleteAll());
         //when
-        List<Model.Person> persons = jdbi.withExtension(JdbiDaoInterface.class, dao -> {
+        List<Model.Person> persons = jdbi.withExtension(JdbiDao.person.class, dao -> {
             //insert - address
-            Long id_ofP1_a1 = dao.insert(p1.getAddress());
-            System.out.println("Addr id id_ofP1_a1="+id_ofP1_a1);
+            Long id_ofP1_a1 = jdbi.withExtension(JdbiDao.address.class, dao1 -> {
+                return dao1.insert(p1.getAddress());
+            });
+
+            System.out.println("Addr id id_ofP1_a1=" + id_ofP1_a1);
             //insert - person with address
-            Long id_ofP1 = dao.insert(p1,id_ofP1_a1);
+            Long id_ofP1 = dao.insert(p1, id_ofP1_a1);
             //insert - person without address
             Long id_ofP2 = dao.insert(p2);
             Long id_ofP3 = dao.insert(p3);
             System.out.println(id_ofP1 + ", " + id_ofP2 + ", " + id_ofP3);
-            final Optional<Model.Person> p2Select = dao.getPersonById(id_ofP2);
+            final Optional<Model.Person> p2Select = dao.get(id_ofP2);
             //check - inserted object is in db
             assertThat(p2Select.isPresent()).isTrue();
             //update - person
             final var p2_updated = Model.Person.newBuilder(p2Select.get()).setLastName("Dummy").build();
             long id_p2 = dao.update(p2_updated);
             //select - person id_ofP1
-            final var optp1_fromdb = dao.getPersonById(id_ofP1);
+            final var optp1_fromdb = dao.get(id_ofP1);
             Model.Person p1_fromdb = optp1_fromdb.get(); //TODO unpreditable error so adding prev line.
             //verify p1 is in db
             assertThat(p1_fromdb).isNotNull();
@@ -82,7 +85,7 @@ public class TestJdbiDaoInterface {
             //delete - person3
             dao.delete(id_ofP3);
             //check - deleted obj is null
-            Optional<Model.Person> p3_delselect = dao.getPersonById(id_ofP3);
+            Optional<Model.Person> p3_delselect = dao.get(id_ofP3);
             assertThat(p3_delselect.isPresent()).isFalse();
             //assertThat(p3_delselect.get()).isNull();//NoSuchElementException: No value present
 

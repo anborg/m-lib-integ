@@ -25,7 +25,7 @@ class DaoImplCase implements CRUDDao<Model.Case> {
     }
 
     @Override
-    public Optional<Model.Case> getById(long l) {
+    public Optional<Model.Case> get(Long l) {
         return Optional.empty();
     }
 
@@ -50,7 +50,7 @@ class DaoImplCase implements CRUDDao<Model.Case> {
     }
 
     @Override
-    public void delete(long l) {
+    public void delete(Long l) {
 
     }
 }

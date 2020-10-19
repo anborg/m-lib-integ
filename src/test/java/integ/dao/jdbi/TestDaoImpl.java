@@ -22,7 +22,7 @@ public class TestDaoImpl {
         //
         final var p1 = Model.Person.newBuilder().setFirstName("Alice").setLastName("Doe").setEmail("alice@gmail.com").build();
         Long id = dao.save(p1);
-        Optional<Model.Person> opt = dao.getById(id);
+        Optional<Model.Person> opt = dao.get(id);
         assertThat(opt.isPresent()).isTrue();//TODO document, sensitive. if I directly dao.get(id).get() throws exception, But if i use opt.get() it works?! proto3 issue.
         final var p = opt.get();
         assertThat(p).isNotNull();
@@ -38,14 +38,14 @@ public class TestDaoImpl {
 
     @Test
     public void get_nonexistant_person() {
-        Optional<Model.Person> opt = dao.getById(9999L);
+        Optional<Model.Person> opt = dao.get(9999L);
         System.out.println(opt);
         assertThat(opt.isPresent()).isFalse();
     }
 
     @Test
     public void get_person_withNoaddress() {
-        Optional<Model.Person> opt = dao.getById(1L);
+        Optional<Model.Person> opt = dao.get(1L);
         assertThat(opt.isPresent()).isFalse();
 //        final var p = opt.get();
 //        System.out.println(p.toString());

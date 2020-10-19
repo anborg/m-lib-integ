@@ -26,7 +26,7 @@ class DaoImplAddress implements CRUDDao<Model.Person> {
     }
 
     @Override
-    public Optional<Model.Person> getById(long id) {
+    public Optional<Model.Person> get(Long id) {
         return Optional.empty();
     }
 
@@ -51,7 +51,7 @@ class DaoImplAddress implements CRUDDao<Model.Person> {
     }
 
     @Override
-    public void delete(long id) {
+    public void delete(Long id) {
 
     }
 }

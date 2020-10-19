@@ -41,17 +41,17 @@ class  PersonDA implements SubsystemService.SubsystemDataAccess<Model.Person>{
     @Override
     public Model.Person save(Model.Person in) {
         long id = dao.save(in);
-        return dao.getById(id).get();//Once saved, assumed "guaranteed" return
+        return dao.get(id).get();//Once saved, assumed "guaranteed" return
     }
     @Override
     public Model.Person update(Model.Person in) {
         long id = dao.update(in);
-        return dao.getById(id).get();//Once saved, assumed "guaranteed" return
+        return dao.get(id).get();//Once saved, assumed "guaranteed" return
     }
     @Override
     public Optional<Model.Person> get(String id) {
         System.out.println("At integServiceImpl person id=" + id);
-        Optional<Model.Person> out = dao.getById(Long.valueOf(id));
+        Optional<Model.Person> out = dao.get(Long.valueOf(id));
         System.out.println("At integServiceImpl pers=" + out);
         return out;
     }
@@ -77,17 +77,17 @@ class  AddressDA implements SubsystemService.SubsystemDataAccess<Model.PostalAdd
     @Override
     public Model.PostalAddress save(Model.PostalAddress in) {
         long id = dao.save(in);
-        return dao.getById(id).get();//Once saved, assumed "guaranteed" return
+        return dao.get(id).get();//Once saved, assumed "guaranteed" return
     }
     @Override
     public Model.PostalAddress update(Model.PostalAddress in) {
         long id = dao.update(in);
-        return dao.getById(id).get();//Once saved, assumed "guaranteed" return
+        return dao.get(id).get();//Once saved, assumed "guaranteed" return
     }
     @Override
     public Optional<Model.PostalAddress> get(String id) {
         System.out.println("At integServiceImpl person id=" + id);
-        Optional<Model.PostalAddress> out = dao.getById(Long.valueOf(id));
+        Optional<Model.PostalAddress> out = dao.get(Long.valueOf(id));
         System.out.println("At integServiceImpl pers=" + out);
         return out;
     }
