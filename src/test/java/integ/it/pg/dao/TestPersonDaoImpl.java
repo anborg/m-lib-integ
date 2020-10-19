@@ -42,7 +42,7 @@ public class TestPersonDaoImpl {
                 .contains(p2.getFirstName(), p2.getLastName());
         // update
         final var p2_ToUpdate = Model.Person.newBuilder(p2_got).setLastName("Stuck-Updated").setDirty(true).build();
-        dao.save(p2_ToUpdate);
+        dao.update(p2_ToUpdate);
         final var p2_Updated = dao.getById(id_ofP2).get();
         //delete
         dao.delete(id_ofP3);

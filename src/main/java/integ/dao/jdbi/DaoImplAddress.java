@@ -7,40 +7,41 @@ import org.jdbi.v3.core.Jdbi;
 import java.util.List;
 import java.util.Optional;
 
-class DaoImplCase implements CRUDDao<Model.Case> {
-    private final Jdbi jdbi;
+@SuppressWarnings("deprecation")
+class DaoImplAddress implements CRUDDao<Model.Person> {
+    Jdbi jdbi;
 
-    public DaoImplCase(Jdbi jdbi) {
+    public DaoImplAddress(Jdbi jdbi) {
+
         this.jdbi = jdbi;
     }
-
-
     @Override
-    public Long save(Model.Case aCase) {
-        return null;
-    }
-    @Override
-    public Long update(Model.Case aCase) {
+    public Long save(Model.Person in) {
         return null;
     }
 
     @Override
-    public Optional<Model.Case> getById(long l) {
+    public Long update(Model.Person in) {
+        return null;
+    }
+
+    @Override
+    public Optional<Model.Person> getById(long id) {
         return Optional.empty();
     }
 
     @Override
-    public List<Model.Case> findBySample(Model.Case aCase) {
+    public List<Model.Person> findBySample(Model.Person in) {
         return null;
     }
 
     @Override
-    public void setInactive(Model.Case aCase) {
+    public void setInactive(Model.Person in) {
 
     }
 
     @Override
-    public List<Model.Case> getAll() {
+    public List<Model.Person> getAll() {
         return null;
     }
 
@@ -50,7 +51,7 @@ class DaoImplCase implements CRUDDao<Model.Case> {
     }
 
     @Override
-    public void delete(long l) {
+    public void delete(long id) {
 
     }
 }

@@ -40,16 +40,11 @@ interface JdbiDaoInterface {//extends CRUDDao<Model.Person>
 
     @GetGeneratedKeys
     @SqlUpdate("update integ.INTEG_PERSON set firstname=:firstName,lastname=:lastName, email=:email, phone1=:phone1, phone2=:phone2 where id=cast(:id as INTEGER)")
-    Long updateNoAddress(@BindBean Model.Person in);
+    Long update(@BindBean Model.Person in);
 
     @GetGeneratedKeys
-    @SqlUpdate("update integ.INTEG_PERSON set firstname=:firstName,lastname=:lastName, email=:email, phone1=:phone1, phone2=:phone2, address_id=:addressIdParam where id=cast(:id as INTEGER)")
-    Long update(@Bind("id") String id, @Bind("firstName") String firstName,
-                @Bind("lastName") String lastName,
-                @Bind("email") String email,
-                @Bind("phone1") String phone1,
-                @Bind("phone2") String phone2,
-                @Bind("addressIdParam") Long addressId);
+    @SqlUpdate("update integ.INTEG_PERSON set firstname=:firstName,lastname=:lastName, email=:email, phone1=:phone1, phone2=:phone2, address_id=:addressId where id=cast(:id as INTEGER)")
+    Long update(@BindBean Model.Person in,@Bind("addressId") Long addressId);
 
     @Deprecated
     @SqlQuery(Queries.sql_person_select_all)
@@ -65,6 +60,7 @@ interface JdbiDaoInterface {//extends CRUDDao<Model.Person>
 
 
     //---------------- ADDRESS ----------------------------
+
     @Transactional
     @GetGeneratedKeys
     @SqlUpdate("insert into INTEG_ADDRESS (streetnum,streetname,postalcode,city,country,lat,lon) values ( :streetNum,:streetName,:postalCode,:city,:country,:lat,:lon)")
@@ -73,5 +69,12 @@ interface JdbiDaoInterface {//extends CRUDDao<Model.Person>
     @GetGeneratedKeys
     @SqlUpdate("insert into INTEG_ADDRESS (streetnum,streetname,postalcode,city,country,lat,lon) values ( :streetNum,:streetName,:postalCode,:city,:country,:lat,:lon)")
     Long update(@BindBean Model.PostalAddress in);
+
+    //TODO find hasOne mechanism for this : see github jdbi fix.
+    @SqlQuery("select 1 from INTEG_ADDRESS where id=cast(:id as INTEGER ) LIMIT 1")
+    String hasAddress(@Bind("id") String id);
+
+
+    //-------------- CASE ---------------
 
 }//Dao

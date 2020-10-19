@@ -7,6 +7,7 @@ import org.jdbi.v3.core.Jdbi;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @SuppressWarnings("deprecation")
@@ -42,16 +43,30 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
         Long addrId = handleAddress(in);
 
         boolean isValidForInsert = DataQuality.Person.isValidForInsert(in);
+        if (isValidForInsert) {
+            if(Objects.nonNull(addrId)){
+                return (long) jdbi.withExtension(JdbiDaoInterface.class, dao -> dao.insert(in, addrId));
+            }
+            return (long) jdbi.withExtension(JdbiDaoInterface.class, dao -> dao.insert(in));
+        } else {
+            throw new UnsupportedOperationException("NOT valid for insert, why is control coming here? Hint: Did you forget to set mandatory fields for Person obj? =" + in + "\n================================");
+        }
+//        return null;
+    }
+
+    @Override
+    public Long update(Model.Person in) {
+        //check address
+        Long addrId = handleAddress(in);
         boolean isValidForUpdate = DataQuality.Person.isValidForUpdate(in);
 
-        if (isValidForInsert) {
-            //return (long) jdbi.withExtension(DaoDelegateInterfacePerson.class, dao -> dao.insertNoAddress(in.getFirstName(), in.getLastName(), in.getEmail(), in.getPhone1(), in.getPhone2()));
-            return (long) jdbi.withExtension(JdbiDaoInterface.class, dao -> dao.insert(in));
-        } else if (isValidForUpdate) {//update
-            return jdbi.withExtension(JdbiDaoInterface.class, dao -> dao.update(in.getId(), in.getFirstName(), in.getLastName(), in.getEmail(), in.getPhone1(), in.getPhone2(), addrId));
-
+        if (isValidForUpdate) {//update
+            if(Objects.nonNull(addrId)){
+                return (long) jdbi.withExtension(JdbiDaoInterface.class, dao -> dao.update(in, addrId));
+            }
+            return jdbi.withExtension(JdbiDaoInterface.class, dao -> dao.update(in));
         } else {
-            throw new UnsupportedOperationException("NO DML, why is control coming here? Hint: Did you forget to set dirty? isValidForInsert=" + isValidForInsert + ", isValidForUpdate=" + isValidForUpdate);
+            throw new UnsupportedOperationException("NO DML, why is control coming here? Hint: Did you forget to set mandatory fields for Person obj? =" + in + "\n====================================");
         }
 //        return null;
     }
@@ -71,7 +86,23 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
 
             } else if (isValidForUpdate) {
                 return jdbi.withExtension(JdbiDaoInterface.class, dao -> dao.update(addrIn));
-            } else {
+            }else if(DataQuality.Address.isValidForeignKeyRef(addrIn)){
+                //check if addr id  exist in db
+                // if not exist, throw error!
+                Optional<Long> id = jdbi.withHandle(handle -> handle.select("select id from INTEG_ADDRESS where id = CAST(:id as INTEGER)")
+                        .bind("id", addrIn.getId())
+                        .mapTo(Long.class)
+                        .findOne());
+                if(id.isEmpty()){
+                    throw new RuntimeException("Not found in db: Address # id="+ addrIn.getId()+", MUST be present to use it as reference. Hint: Client providing spurious address-id in request obj?");
+                }else{
+                    return id.get();
+                }
+                //jdbi.withExtension(JdbiDaoInterface.class, dao -> {
+                //    dao.hasAddress(addrIn.getId())
+                //});
+            }
+            else {
                 throw new UnsupportedOperationException("NO DML to act-on. Why is control coming here? Hint: Did you forget to set dirty? isValidForInsert=" + isValidForInsert + ", isValidForUpdate=" + isValidForUpdate);
             }
         }

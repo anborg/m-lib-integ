@@ -78,17 +78,21 @@ public class IntegUtil {
 
     public static SubsystemService inMem() {
         final var ds = inmemDatasource();
-        CRUDDao<Model.Person> personDao = JdbiDbUtil.getDao(ds, Model.Person.class);
-        CRUDDao<Model.Case> caseDao = JdbiDbUtil.getDao(ds, Model.Case.class);
-        return new IntegServiceImpl(personDao, caseDao);
+        return withDs(ds);
     }
 
     public static SubsystemService dev() {
         final var ds = devDatasource();
-        CRUDDao<Model.Person> personDao = JdbiDbUtil.getDao(ds, Model.Person.class);
-        CRUDDao<Model.Case> caseDao = JdbiDbUtil.getDao(ds, Model.Case.class);
-        return new IntegServiceImpl(personDao, caseDao);
+        return withDs(ds);
+
     }
+    public static IntegServiceImpl withDs(DataSource ds){
+        CRUDDao<Model.Person> personDao = JdbiDbUtil.getDao(ds, Model.Person.class);
+        CRUDDao<Model.PostalAddress> addressDao = JdbiDbUtil.getDao(ds, Model.PostalAddress.class);
+        CRUDDao<Model.Case> caseDao = JdbiDbUtil.getDao(ds, Model.Case.class);
+        return new IntegServiceImpl(personDao, addressDao,caseDao);
+    }
+
 
     private static class Dummy {/*for prop file load*/
     }

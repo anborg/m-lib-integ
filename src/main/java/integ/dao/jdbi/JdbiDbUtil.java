@@ -52,6 +52,10 @@ public class JdbiDbUtil {
         if (type.getName() == Model.Person.class.getName()) {
             return (CRUDDao<T>) new DaoImplPerson(withDbPlugin(ds));
         }
+        if (type.getName() == Model.PostalAddress.class.getName()) {
+            return (CRUDDao<T>) new DaoImplAddress(withDbPlugin(ds));
+        }
+
         if (type.getName() == Model.Case.class.getName()) {
             return (CRUDDao<T>) new DaoImplCase(withDbPlugin(ds));
         }

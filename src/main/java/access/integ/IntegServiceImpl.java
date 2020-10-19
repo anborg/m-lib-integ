@@ -8,79 +8,132 @@ import java.util.List;
 import java.util.Optional;
 
 class IntegServiceImpl implements SubsystemService {
+    PersonDA personDA;
+    AddressDA addressDA;
+    CaseDA caseDA;
 
-    CRUDDao<Model.Person> personDao;
-    CRUDDao<Model.Case> caseDao;
 
-    public IntegServiceImpl(CRUDDao<Model.Person> persDao, CRUDDao<Model.Case> caseDao) {
-        this.personDao = persDao;
-        this.caseDao = caseDao;
+    public IntegServiceImpl(CRUDDao<Model.Person> persDao, CRUDDao<Model.PostalAddress> addressDao,CRUDDao<Model.Case> caseDao) {
+        this.personDA = new PersonDA(persDao);
+        this.addressDA = new AddressDA(addressDao);
+        this.caseDA = new CaseDA(caseDao);
     }
 
     @Override
     public SubsystemDataAccess<Model.Person> person() {
-        return buildPersonService();
+        return personDA;
     }
-
-
+    @Override
+    public SubsystemDataAccess<Model.PostalAddress> address() {
+        return addressDA;
+    }
     @Override
     public SubsystemDataAccess<Model.Case> ccase() {
-        return buildCaseService();
+        return caseDA;
+    }
+}//IntegServiceImpl
+
+
+// Just grouping all Person Data access in one place {save/update/get/find/recent}
+class  PersonDA implements SubsystemService.SubsystemDataAccess<Model.Person>{
+    CRUDDao<Model.Person> dao;
+    public PersonDA(CRUDDao<Model.Person> dao){this.dao=dao;}
+    @Override
+    public Model.Person save(Model.Person in) {
+        long id = dao.save(in);
+        return dao.getById(id).get();//Once saved, assumed "guaranteed" return
+    }
+    @Override
+    public Model.Person update(Model.Person in) {
+        long id = dao.update(in);
+        return dao.getById(id).get();//Once saved, assumed "guaranteed" return
+    }
+    @Override
+    public Optional<Model.Person> get(String id) {
+        System.out.println("At integServiceImpl person id=" + id);
+        Optional<Model.Person> out = dao.getById(Long.valueOf(id));
+        System.out.println("At integServiceImpl pers=" + out);
+        return out;
     }
 
-    private SubsystemDataAccess<Model.Person> buildPersonService() {
-        return new SubsystemDataAccess<Model.Person>() {
-            @Override
-            public Model.Person save(Model.Person in) {
-                long id = personDao.save(in);
-                return personDao.getById(id).get();//Once saved, assumed "guaranteed" return
-            }
-
-            @Override
-            public Optional<Model.Person> get(String id) {
-                System.out.println("At integServiceImpl person id=" + id);
-                Optional<Model.Person> out = personDao.getById(Long.valueOf(id));
-                System.out.println("At integServiceImpl pers=" + out);
-                return out;
-            }
-
-            @Override
-            public List<Model.Person> find(Model.Person person) {
-                List<Model.Person> out = personDao.getAll();//TODO change later
-                return out;
-            }
-
-            @Override
-            public List<Model.Person> recent() {
-                List<Model.Person> out = personDao.getAll();
-                return out;
-            }
-        };
+    @Override
+    public List<Model.Person> find(Model.Person person) {
+        List<Model.Person> out = dao.getAll();//TODO change later
+        return out;
     }
 
-    private SubsystemDataAccess<Model.Case> buildCaseService() {
-        return new SubsystemDataAccess<Model.Case>() {
-            @Override
-            public Model.Case save(Model.Case aCase) {
-                throw new UnsupportedOperationException("Please get it implemented");
-            }
-
-            @Override
-            public Optional<Model.Case> get(String s) {
-                return Optional.empty();
-            }
-
-            @Override
-            public List<Model.Case> find(Model.Case aCase) {
-                return null;
-            }
-
-            @Override
-            public List<Model.Case> recent() {
-                return null;
-            }
-        };
+    @Override
+    public List<Model.Person> recent() {
+        List<Model.Person> out = dao.getAll();//TODO change later
+        return out;
     }
+}
+
+
+// Just grouping all Case Data access in one place {save/update/get/find/recent}
+class  AddressDA implements SubsystemService.SubsystemDataAccess<Model.PostalAddress>{
+    CRUDDao<Model.PostalAddress> dao;
+    public AddressDA(CRUDDao<Model.PostalAddress> dao){this.dao=dao;}
+    @Override
+    public Model.PostalAddress save(Model.PostalAddress in) {
+        long id = dao.save(in);
+        return dao.getById(id).get();//Once saved, assumed "guaranteed" return
+    }
+    @Override
+    public Model.PostalAddress update(Model.PostalAddress in) {
+        long id = dao.update(in);
+        return dao.getById(id).get();//Once saved, assumed "guaranteed" return
+    }
+    @Override
+    public Optional<Model.PostalAddress> get(String id) {
+        System.out.println("At integServiceImpl person id=" + id);
+        Optional<Model.PostalAddress> out = dao.getById(Long.valueOf(id));
+        System.out.println("At integServiceImpl pers=" + out);
+        return out;
+    }
+
+    @Override
+    public List<Model.PostalAddress> find(Model.PostalAddress in) {
+        List<Model.PostalAddress> out = dao.getAll();//TODO change later
+        return out;
+    }
+
+    @Override
+    public List<Model.PostalAddress> recent() {
+        List<Model.PostalAddress> out = dao.getAll();//TODO change later
+        return out;
+    }
+}
+// Just grouping all Case Data access in one place {save/update/get/find/recent}
+class  CaseDA implements SubsystemService.SubsystemDataAccess<Model.Case>{
+    CRUDDao<Model.Case> dao;
+    public CaseDA(CRUDDao<Model.Case> dao){}
+    @Override
+    public Model.Case save(Model.Case aCase) {
+        throw new UnsupportedOperationException("Please get it implemented");
+    }
+    @Override
+    public Model.Case update(Model.Case aCase) {
+        throw new UnsupportedOperationException("Please get it implemented");
+    }
+
+    @Override
+    public Optional<Model.Case> get(String id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<Model.Case> find(Model.Case aCase) {
+        return null;
+    }
+
+    @Override
+    public List<Model.Case> recent() {
+        return null;
+    }
+}
+
+
 
 
 //
@@ -138,4 +191,3 @@ class IntegServiceImpl implements SubsystemService {
 //    public List<Model.Case> findCase(Model.Case aCase) {
 //        return null;
 //    }
-}
