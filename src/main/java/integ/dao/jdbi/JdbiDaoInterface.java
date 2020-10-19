@@ -16,10 +16,9 @@ import java.util.Optional;
 //@RegisterBeanMapper(MapperPersonWithAddress.class) //DO NOT ADD mapper at class level. Add at method level //TODO make note.
 interface JdbiDaoInterface {//extends CRUDDao<Model.Person>
 
-    @Deprecated
-    @GetGeneratedKeys
-    @SqlUpdate("INSERT INTO integ.INTEG_PERSON(firstname, lastname, email, phone1, phone2 VALUES ( :firstName, :lastName, :email, :phone1, :phone2) RETURNING id")
-    Long save(@BindBean Model.Person in);
+//    @GetGeneratedKeys
+//    @SqlUpdate("INSERT INTO integ.INTEG_PERSON(firstname, lastname, email, phone1, phone2 VALUES ( :firstName, :lastName, :email, :phone1, :phone2)")
+//    Long insert(@BindBean Model.Person in);
 
 
     @Deprecated

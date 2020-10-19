@@ -3,7 +3,6 @@ package integ.dao.jdbi;
 import access.integ.IntegUtil;
 import muni.dao.CRUDDao;
 import muni.model.Model;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +15,7 @@ public class TestDaoImpl {
     CRUDDao<Model.Person> dao= null;
 
     @BeforeEach
-    public void setup(){dao = new DaoImplPerson(JdbiDbUtil.withDbPlugin(IntegUtil.inmemDatasource())); }
+    public void setup(){dao = new DaoImplPerson(JdbiDbUtil.withDbPlugin(IntegUtil.inmemDS())); }
 
     @Test
     public void test_jdbi_person_dao() {

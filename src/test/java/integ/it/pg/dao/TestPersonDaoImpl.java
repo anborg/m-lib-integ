@@ -18,7 +18,7 @@ public class TestPersonDaoImpl {
 
     @Test
     public void testDao_CRUD() {
-        CRUDDao<Model.Person> dao = JdbiDbUtil.getDao(IntegUtil.inmemDatasource(), Model.Person.class);
+        CRUDDao<Model.Person> dao = JdbiDbUtil.getDao(IntegUtil.inmemDS(), Model.Person.class);
         //dao.createTable(); //Just for one time.
         dao.deleteAll();
         List<Model.Person> listShouldBeEmpty = dao.getAll();

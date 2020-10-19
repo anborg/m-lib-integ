@@ -62,7 +62,7 @@ public class IntegUtil {
         return hdc;
     }
 
-    public static DataSource inmemDatasource() {
+    public static DataSource inmemDS() {
         final Properties props = new Properties();
         org.h2.jdbcx.JdbcDataSource ds = null;
         ds = new org.h2.jdbcx.JdbcDataSource();
@@ -77,7 +77,7 @@ public class IntegUtil {
     }
 
     public static SubsystemService inMem() {
-        final var ds = inmemDatasource();
+        final var ds = inmemDS();
         return withDs(ds);
     }
 

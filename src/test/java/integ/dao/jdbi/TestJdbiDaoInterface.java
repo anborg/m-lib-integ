@@ -18,7 +18,7 @@ public class TestJdbiDaoInterface {
 //    String url3 = "jdbc:h2:mem:testdb;INIT=CREATE SCHEMA IF NOT EXISTS INTEG\\;SET SCHEMA INTEG\\;";
 
     public Jdbi buildJdbi() {
-        Jdbi jdbi = JdbiDbUtil.withDbPlugin(IntegUtil.inmemDatasource());
+        Jdbi jdbi = JdbiDbUtil.withDbPlugin(IntegUtil.inmemDS());
         return jdbi;
     }
 
@@ -40,20 +40,20 @@ public class TestJdbiDaoInterface {
         //when
         List<Model.Person> persons = jdbi.withExtension(JdbiDaoInterface.class, dao -> {
             //insert - address
-            long id_ofP1_a1 = dao.insert(p1.getAddress());
+            Long id_ofP1_a1 = dao.insert(p1.getAddress());
             System.out.println("Addr id id_ofP1_a1="+id_ofP1_a1);
             //insert - person with address
-            long id_ofP1 = dao.insert(p1,id_ofP1_a1);
+            Long id_ofP1 = dao.insert(p1,id_ofP1_a1);
             //insert - person without address
-            long id_ofP2 = dao.insert(p2);
-            long id_ofP3 = dao.insert(p3);
+            Long id_ofP2 = dao.insert(p2);
+            Long id_ofP3 = dao.insert(p3);
             System.out.println(id_ofP1 + ", " + id_ofP2 + ", " + id_ofP3);
             final Optional<Model.Person> p2Select = dao.getPersonById(id_ofP2);
             //check - inserted object is in db
             assertThat(p2Select.isPresent()).isTrue();
             //update - person
             final var p2_updated = Model.Person.newBuilder(p2Select.get()).setLastName("Dummy").build();
-            long id_p2 = dao.updateNoAddress(p2_updated);
+            long id_p2 = dao.update(p2_updated);
             //select - person id_ofP1
             final var optp1_fromdb = dao.getPersonById(id_ofP1);
             Model.Person p1_fromdb = optp1_fromdb.get(); //TODO unpreditable error so adding prev line.
