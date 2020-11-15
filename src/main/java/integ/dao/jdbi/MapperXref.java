@@ -23,7 +23,7 @@ class MapperXref implements RowMapper<Model.Xref> {
         if(null == person_id) return null;//TODO make not of this nul return.
         String xref_sys_id = rs.getString("xref_sys_id");
         String xref_person_id = rs.getString("xref_person_id");
-        Optional.ofNullable(xref_sys_id).ifPresent(xref::setXrefSysId);
+        Optional.ofNullable(xref_sys_id).ifPresent(xref::setXrefSubsysId);
         Optional.ofNullable(xref_person_id).ifPresent(xref::setXrefPersonId);
         var ts_create = Timestamps.fromSeconds(rs.getTimestamp("ts_create").toInstant().getEpochSecond());
         var ts_update = Timestamps.fromSeconds(rs.getTimestamp("ts_update").toInstant().getEpochSecond());

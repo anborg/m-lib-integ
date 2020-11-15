@@ -22,7 +22,7 @@ class JdbiDao {//extends CRUDDao<Model.Person>
     public interface xref{
         @Transactional
         @GetGeneratedKeys
-        @SqlUpdate("insert into integ.INTEG_XREF_PERSON (id, xref_sys_id, xref_person_id) VALUES ( :person_id, :xrefSysId, :xrefPersonId )")
+        @SqlUpdate("insert into integ.INTEG_XREF_PERSON (id, xref_sys_id, xref_person_id) VALUES ( :person_id, :xrefSubsysId, :xrefPersonId )")
 // RETURNING id
         Long insert(@Bind("person_id") Long personId,@BindBean Model.Xref in);
 

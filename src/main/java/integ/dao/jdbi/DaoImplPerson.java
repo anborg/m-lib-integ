@@ -36,7 +36,7 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
             return optPerson;
         }else{
             var pBuilder = Model.Person.newBuilder(optPerson.get());
-            xref.forEach(x -> pBuilder.putXrefAccounts(x.getXrefSysId(), x));
+            xref.forEach(x -> pBuilder.putXrefAccounts(x.getXrefSubsysId(), x));
             return Optional.of(pBuilder.build());
         }
     }

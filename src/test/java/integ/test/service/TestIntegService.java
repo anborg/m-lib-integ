@@ -46,11 +46,11 @@ public class TestIntegService {
 
     @Test
     public void create_person_for_ssAmanda(){
-        var amdXref = Model.Xref.newBuilder().setXrefSysId("AMANDA").build();
+        var amdXref = Model.Xref.newBuilder().setXrefSubsysId("AMANDA").build();
         Model.Person c1_new = Model.Person.newBuilder()
                 .setFirstName("Bob").setLastName("Fork")
                 .setEmail("bob@gmail.com")
-                .putXrefAccounts(amdXref.getXrefSysId(), amdXref)
+                .putXrefAccounts(amdXref.getXrefSubsysId(), amdXref)
                 //.putXrefAccounts("HANSEN", null)
                 .build();
         //valid?
@@ -60,11 +60,11 @@ public class TestIntegService {
         //validate -
         assertThat(c1_fromdb).extracting(Model.Person::getFirstName ,Model.Person::getLastName, Model.Person::getEmail)
                 .containsExactly(c1_new.getFirstName(),c1_new.getLastName(), c1_new.getEmail());
-        var amdXref_fromdb = c1_fromdb.getXrefAccountsMap().get(amdXref.getXrefSysId());
+        var amdXref_fromdb = c1_fromdb.getXrefAccountsMap().get(amdXref.getXrefSubsysId());
         assertThat(amdXref_fromdb).isNotNull();
 
-        assertThat(amdXref_fromdb).extracting(Model.Xref::getXrefSysId)
-                .containsExactly(amdXref.getXrefSysId());
+        assertThat(amdXref_fromdb).extracting(Model.Xref::getXrefSubsysId)
+                .containsExactly(amdXref.getXrefSubsysId());
         assertThat(amdXref_fromdb.getXrefPersonId()).isNotNull();
     }
 
@@ -75,6 +75,4 @@ public class TestIntegService {
         final var createdCase = service.ccase().create(mycase);
         //System.out.println(createdCase);
     }
-
-
 }
