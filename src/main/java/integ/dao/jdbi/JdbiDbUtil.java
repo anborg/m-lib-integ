@@ -15,7 +15,9 @@ public class JdbiDbUtil {
     private static void common(Jdbi jdbi) {
         jdbi.installPlugin(new SqlObjectPlugin())
                 //common mappers
-                .registerRowMapper(new MapperPersonWithAddress());
+                .registerRowMapper(new MapperPersonWithAddress())
+                .registerRowMapper(new MapperXref())
+        ;
     }
 
     public static Jdbi withDbPlugin(DataSource ds) {
@@ -51,6 +53,9 @@ public class JdbiDbUtil {
         //if (!type.isInterface()) throw new RuntimeException("Only interface type expected");
         if (type.getName() == Model.Person.class.getName()) {
             return (CRUDDao<T>) new DaoImplPerson(withDbPlugin(ds));
+        }
+        if (type.getName() == Model.Xref.class.getName()) {
+            return (CRUDDao<T>) new DaoImplXref(withDbPlugin(ds));
         }
         if (type.getName() == Model.PostalAddress.class.getName()) {
             return (CRUDDao<T>) new DaoImplAddress(withDbPlugin(ds));

@@ -21,7 +21,7 @@ public class TestDaoImpl {
     public void test_jdbi_person_dao() {
         //
         final var p1 = Model.Person.newBuilder().setFirstName("Alice").setLastName("Doe").setEmail("alice@gmail.com").build();
-        Long id = dao.save(p1);
+        Long id = dao.create(p1);
         Optional<Model.Person> opt = dao.get(id);
         assertThat(opt.isPresent()).isTrue();//TODO document, sensitive. if I directly dao.get(id).get() throws exception, But if i use opt.get() it works?! proto3 issue.
         final var p = opt.get();

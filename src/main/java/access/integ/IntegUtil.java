@@ -15,12 +15,13 @@ import java.util.Properties;
 import java.util.Random;
 
 public class IntegUtil {
-//    public static final String INMEM_DB_URL = "jdbc:h2:mem:test;" +
-//            "INIT=RUNSCRIPT FROM 'classpath:h2/schema.sql'\\;" +
-//            "RUNSCRIPT FROM 'classpath:h2/data.sql'";
+    // Use for junit
+    public static SubsystemService inMem() {return withDs(inmemDS());}
+    // Use for integ-test
+    public static SubsystemService dev() {return withDs(devDS());}
 
 
-    public static String inmemDbUrl_anon_one_connection(){
+    private static String inmemDbUrl_anon_one_connection(){
         String INMEM_DB_URL = "jdbc:h2:mem:;"+
         "INIT=RUNSCRIPT FROM 'classpath:integ/schema.sql'\\;" +
                 "RUNSCRIPT FROM 'classpath:integ/data.sql'";
@@ -31,7 +32,7 @@ public class IntegUtil {
 
     final static Random random = new Random();
 
-    public static DataSource devDatasource() {
+    private static DataSource devDS() {
         final Properties props = new Properties();
         PGSimpleDataSource ds = null;
         try (final InputStream stream =
@@ -76,21 +77,13 @@ public class IntegUtil {
         return hdc;
     }
 
-    public static SubsystemService inMem() {
-        final var ds = inmemDS();
-        return withDs(ds);
-    }
 
-    public static SubsystemService dev() {
-        final var ds = devDatasource();
-        return withDs(ds);
-
-    }
-    public static IntegServiceImpl withDs(DataSource ds){
+    private static IntegServiceImpl withDs(DataSource ds){
         CRUDDao<Model.Person> personDao = JdbiDbUtil.getDao(ds, Model.Person.class);
+        CRUDDao<Model.Xref> xrefDao = JdbiDbUtil.getDao(ds, Model.Xref.class);
         CRUDDao<Model.PostalAddress> addressDao = JdbiDbUtil.getDao(ds, Model.PostalAddress.class);
         CRUDDao<Model.Case> caseDao = JdbiDbUtil.getDao(ds, Model.Case.class);
-        return new IntegServiceImpl(personDao, addressDao,caseDao);
+        return new IntegServiceImpl(personDao,xrefDao,addressDao,caseDao);
     }
 
 

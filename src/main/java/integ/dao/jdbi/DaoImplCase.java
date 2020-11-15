@@ -16,7 +16,7 @@ class DaoImplCase implements CRUDDao<Model.Case> {
 
 
     @Override
-    public Long save(Model.Case aCase) {
+    public Long create(Model.Case aCase) {
         return null;
     }
     @Override
@@ -30,7 +30,7 @@ class DaoImplCase implements CRUDDao<Model.Case> {
     }
 
     @Override
-    public List<Model.Case> findBySample(Model.Case aCase) {
+    public List<Model.Case> find(Model.Case aCase) {
         return null;
     }
 

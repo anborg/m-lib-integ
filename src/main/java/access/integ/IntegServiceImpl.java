@@ -13,8 +13,8 @@ class IntegServiceImpl implements SubsystemService {
     CaseDA caseDA;
 
 
-    public IntegServiceImpl(CRUDDao<Model.Person> persDao, CRUDDao<Model.PostalAddress> addressDao,CRUDDao<Model.Case> caseDao) {
-        this.personDA = new PersonDA(persDao);
+    public IntegServiceImpl(CRUDDao<Model.Person> persDao,CRUDDao<Model.Xref> xrefDao, CRUDDao<Model.PostalAddress> addressDao,CRUDDao<Model.Case> caseDao) {
+        this.personDA = new PersonDA(persDao, xrefDao);
         this.addressDA = new AddressDA(addressDao);
         this.caseDA = new CaseDA(caseDao);
     }
@@ -36,35 +36,38 @@ class IntegServiceImpl implements SubsystemService {
 
 // Just grouping all Person Data access in one place {save/update/get/find/recent}
 class  PersonDA implements SubsystemService.SubsystemDataAccess<Model.Person>{
-    CRUDDao<Model.Person> dao;
-    public PersonDA(CRUDDao<Model.Person> dao){this.dao=dao;}
+    CRUDDao<Model.Person> daoPers;
+    CRUDDao<Model.Xref> daoXref;
+    public PersonDA(CRUDDao<Model.Person> daoPers,CRUDDao<Model.Xref> daoXref){this.daoPers = daoPers;this.daoXref = daoXref;}
     @Override
-    public Model.Person save(Model.Person in) {
-        long id = dao.save(in);
-        return dao.get(id).get();//Once saved, assumed "guaranteed" return
+    public Model.Person create(Model.Person in) {
+        Long id = daoPers.create(in);
+        //4. TODO Command-SS to create those accounts - api calls
+        //5. TODO Update SS-personId to subbaccounts in INTEG_XREF
+        return daoPers.get(id).get();//Once saved, assumed "guaranteed" return
     }
     @Override
     public Model.Person update(Model.Person in) {
-        long id = dao.update(in);
-        return dao.get(id).get();//Once saved, assumed "guaranteed" return
+        Long id = daoPers.update(in);
+        return daoPers.get(id).get();//Once saved, assumed "guaranteed" return
     }
     @Override
     public Optional<Model.Person> get(String id) {
         System.out.println("At integServiceImpl person id=" + id);
-        Optional<Model.Person> out = dao.get(Long.valueOf(id));
+        Optional<Model.Person> out = daoPers.get(Long.valueOf(id));
         System.out.println("At integServiceImpl pers=" + out);
         return out;
     }
 
     @Override
     public List<Model.Person> find(Model.Person person) {
-        List<Model.Person> out = dao.getAll();//TODO change later
+        List<Model.Person> out = daoPers.getAll();//TODO change later
         return out;
     }
 
     @Override
     public List<Model.Person> recent() {
-        List<Model.Person> out = dao.getAll();//TODO change later
+        List<Model.Person> out = daoPers.getAll();//TODO change later
         return out;
     }
 }
@@ -75,8 +78,8 @@ class  AddressDA implements SubsystemService.SubsystemDataAccess<Model.PostalAdd
     CRUDDao<Model.PostalAddress> dao;
     public AddressDA(CRUDDao<Model.PostalAddress> dao){this.dao=dao;}
     @Override
-    public Model.PostalAddress save(Model.PostalAddress in) {
-        long id = dao.save(in);
+    public Model.PostalAddress create(Model.PostalAddress in) {
+        long id = dao.create(in);
         return dao.get(id).get();//Once saved, assumed "guaranteed" return
     }
     @Override
@@ -109,7 +112,7 @@ class  CaseDA implements SubsystemService.SubsystemDataAccess<Model.Case>{
     CRUDDao<Model.Case> dao;
     public CaseDA(CRUDDao<Model.Case> dao){}
     @Override
-    public Model.Case save(Model.Case aCase) {
+    public Model.Case create(Model.Case aCase) {
         throw new UnsupportedOperationException("Please get it implemented");
     }
     @Override

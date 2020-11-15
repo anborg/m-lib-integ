@@ -16,7 +16,7 @@ class DaoImplAddress implements CRUDDao<Model.Person> {
         this.jdbi = jdbi;
     }
     @Override
-    public Long save(Model.Person in) {
+    public Long create(Model.Person in) {
         return null;
     }
 
@@ -31,7 +31,7 @@ class DaoImplAddress implements CRUDDao<Model.Person> {
     }
 
     @Override
-    public List<Model.Person> findBySample(Model.Person in) {
+    public List<Model.Person> find(Model.Person in) {
         return null;
     }
 

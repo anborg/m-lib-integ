@@ -19,6 +19,19 @@ class JdbiDao {//extends CRUDDao<Model.Person>
     //    @GetGeneratedKeys
 //    @SqlUpdate("INSERT INTO integ.INTEG_PERSON(firstname, lastname, email, phone1, phone2 VALUES ( :firstName, :lastName, :email, :phone1, :phone2)")
 //    Long insert(@BindBean Model.Person in);
+    public interface xref{
+        @Transactional
+        @GetGeneratedKeys
+        @SqlUpdate("insert into integ.INTEG_XREF_PERSON (id, xref_sys_id, xref_person_id) VALUES ( :person_id, :xrefSysId, :xrefPersonId )")
+// RETURNING id
+        Long insert(@Bind("person_id") Long personId,@BindBean Model.Xref in);
+
+
+        @SqlQuery("SELECT id, xref_sys_id, xref_person_id, ts_create, ts_update,ts_ss_refreshed from integ.INTEG_XREF_PERSON where id = :id")
+        @RegisterBeanMapper(MapperXref.class)
+        List<Model.Xref> getXrefPerson(@Bind("id") Long id);
+    }
+
     public interface person {
         @Deprecated
         @SqlQuery(Queries.sql_person_select_byId)

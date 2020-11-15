@@ -5,6 +5,7 @@ import muni.model.Model;
 import muni.util.DataQuality;
 import org.jdbi.v3.core.Jdbi;
 
+import javax.swing.text.html.Option;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -15,10 +16,7 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
 
     Jdbi jdbi;
 
-    public DaoImplPerson(Jdbi jdbi) {
-
-        this.jdbi = jdbi;
-    }
+    public DaoImplPerson(Jdbi jdbi) { this.jdbi = jdbi; }
 
 
     @Override
@@ -32,28 +30,39 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
 //            //System.out.println(p);
 //            return p;
 //        });
-        return jdbi.withExtension(JdbiDao.person.class, dao -> {
-            return dao.get(id);
-        });
+        var optPerson= jdbi.withExtension(JdbiDao.person.class, dao -> { return dao.get(id); });
+        List<Model.Xref> xref = optPerson.isPresent()? jdbi.withExtension(JdbiDao.xref.class, dao -> {return dao.getXrefPerson(id);}) : List.of();
+        if(xref.isEmpty()){
+            return optPerson;
+        }else{
+            var pBuilder = Model.Person.newBuilder(optPerson.get());
+            xref.forEach(x -> pBuilder.putXrefAccounts(x.getXrefSysId(), x));
+            return Optional.of(pBuilder.build());
+        }
     }
 
     @Override
-    public Long save(Model.Person in) {
-        //check address
-        Long addrId = handleAddress(in);
-
+    public Long create(Model.Person in) {
         boolean isValidForInsert = DataQuality.Person.isValidForInsert(in);
-        if (isValidForInsert) {
-            if(Objects.nonNull(addrId)){
-                return (long) jdbi.withExtension(JdbiDao.person.class, dao -> dao.insert(in, addrId));
-            }
-            return (long) jdbi.withExtension(JdbiDao.person.class, dao -> dao.insert(in));
-        } else {
-            throw new UnsupportedOperationException("NOT valid for insert, why is control coming here? Hint: Did you forget to set mandatory fields for Person obj? =" + in + "\n================================");
+        if(!isValidForInsert) throw new UnsupportedOperationException("NOT valid for insert, why is control coming here? Hint: Did you forget to set mandatory fields for Person obj? =" + in + "\n================================");
+        //1. Save the address.
+        Long addrId = handleAddress(in);
+        //2. Save person details
+        Long personId = null;
+        if(Objects.nonNull(addrId)){
+            personId =  jdbi.withExtension(JdbiDao.person.class, dao -> dao.insert(in, addrId));
+        }else{
+            personId =jdbi.withExtension(JdbiDao.person.class, dao -> dao.insert(in));
         }
-//        return null;
+        //3. Save intentions on SS-accounts in INTEG_XREF
+        handleXref(personId, in);
+        return personId;
     }
-
+    private void handleXref(final Long personId, Model.Person in){
+        in.getXrefAccountsMap().values().forEach( xref -> {
+            jdbi.withExtension(JdbiDao.xref.class, dao -> dao.insert(personId, xref));
+        });
+    }
     @Override
     public Long update(Model.Person in) {
         //check address
@@ -110,7 +119,7 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
     }
 
     @Override
-    public List<Model.Person> findBySample(Model.Person in){
+    public List<Model.Person> find(Model.Person in){
         return Collections.EMPTY_LIST;
     }
     @Override

@@ -27,9 +27,9 @@ public class TestPersonDaoImpl {
         final var p1 = Model.Person.newBuilder().setFirstName("Alice").setLastName("Doe").setEmail("alice@gmail.com").build();
         final var p2 = Model.Person.newBuilder().setFirstName("Clarice").setLastName("Stuck").setEmail("clarice@gmail.com").build();
         final var p3 = Model.Person.newBuilder().setFirstName("Delete").setLastName("Me").setEmail("delete@gmail.com").build();
-        Long id_ofP1 = dao.save(p1);
-        Long id_ofP2 = dao.save(p2);
-        Long id_ofP3 = dao.save(p3);
+        Long id_ofP1 = dao.create(p1);
+        Long id_ofP2 = dao.create(p2);
+        Long id_ofP3 = dao.create(p3);
         System.out.println(id_ofP1 + ", " + id_ofP2 + ", " + id_ofP3);
         // get
         final var p1_got = dao.get(id_ofP1).get();
@@ -41,7 +41,7 @@ public class TestPersonDaoImpl {
                 .extracting(Model.Person::getFirstName, Model.Person::getLastName)
                 .contains(p2.getFirstName(), p2.getLastName());
         // update
-        final var p2_ToUpdate = Model.Person.newBuilder(p2_got).setLastName("Stuck-Updated").setDirty(true).build();
+        final var p2_ToUpdate = Model.Person.newBuilder(p2_got).setLastName("Stuck-Updated").build();//.setDirty(true)
         dao.update(p2_ToUpdate);
         final var p2_Updated = dao.get(id_ofP2).get();
         //delete
