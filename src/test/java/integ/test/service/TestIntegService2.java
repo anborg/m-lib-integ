@@ -47,7 +47,7 @@ public class TestIntegService2 {
     }
 
     @Test
-    public void create_person_for_ssAmanda() {
+    public void person_changes_must_syc_to_ALL_SUBSYSTEMS_amanda() {
         var amdXref = Model.Xref.newBuilder().setXrefSystemId(Subsys.AMANDA.toString()).build();
         Model.Person c1_new = Model.Person.newBuilder()
                 .setFirstName("Bob").setLastName("Fork")
@@ -66,10 +66,34 @@ public class TestIntegService2 {
         //check xref
         var amdXref_fromdb = c1_fromdb.getXrefAccountsMap().get(amdXref.getXrefSystemId());
         assertThat(amdXref_fromdb).isNotNull();
-
-        assertThat(amdXref_fromdb).extracting(Model.Xref::getXrefSystemId)
-                .containsExactly(amdXref.getXrefSystemId());
+        assertThat(amdXref_fromdb).extracting(Model.Xref::getXrefSystemId, Model.Xref::getId, Model.Xref::getXrefPersonId)
+                .containsExactly(amdXref.getXrefSystemId(), c1_fromdb.getId(), amdXref_fromdb.getXrefPersonId());
         assertThat(amdXref_fromdb.getXrefPersonId()).isNotNull();
+
+        //Verofu update
+        update_and_verify(c1_fromdb);
+
+    }
+    //This method assumes
+    private void update_and_verify(Model.Person in){
+        String updatedLastName = in.getLastName()+ "Jimmy";
+        var person = Model.Person.newBuilder(in).setLastName(updatedLastName).build();
+        //update
+        var integPerson_fromdb = service.update(person);
+
+        //verify
+        //verify lastname in integ obj
+        assertThat(integPerson_fromdb).extracting(Model.Person::getLastName).containsExactly(updatedLastName);
+
+        //verify lastname propagated to amanda
+        Subsys amanda = Subsys.AMANDA;
+        var amdService = service.getSubsystemService(amanda.toString());
+        var amdXref = integPerson_fromdb.getXrefAccountsMap().get(amanda.toString());
+        assertThat(amdXref).isNotNull();
+        var xrefPerson = service.getSubsystemPerson(amdXref).get();
+        assertThat(xrefPerson)
+                .extracting(Model.Person::getId, Model.Person::getLastName)
+                .containsExactly(amdXref.getXrefPersonId(), updatedLastName);
     }
 
 

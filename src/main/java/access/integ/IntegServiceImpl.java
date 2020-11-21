@@ -13,12 +13,8 @@ import java.util.stream.Collectors;
  * Implements integ service.
  */
 class IntegServiceImpl implements IntegService {
-    //    CRUDDao<Model.Person> persDao;
-//    CRUDDao<Model.Xref> xrefDao;
-//    CRUDDao<Model.PostalAddress> addressDao;
-//    CRUDDao<Model.Case> caseDao;
-    IntegDao integDao;
 
+    IntegDao integDao;
 
     Map<Subsys, SubsystemService> serviceMap = new HashMap<>();
 
@@ -26,23 +22,16 @@ class IntegServiceImpl implements IntegService {
         this.integDao = integDao;
     }
 
-    public IntegServiceImpl(CRUDDao<Model.Person> persDao, CRUDDao<Model.Xref> xrefDao, CRUDDao<Model.PostalAddress> addressDao, CRUDDao<Model.Case> caseDao) {
-//        this.persDao = persDao;
-//        this.xrefDao = xrefDao;
-//        this.addressDao = addressDao;
-//        this.caseDao = caseDao;
-    }
-
     @Override
-    public void setSubSystemService(Subsys subsys, SubsystemService service) {
+    public void setSubsystemService(Subsys subsys, SubsystemService service) {
         if (serviceMap.containsKey(subsys))
             throw new RuntimeException("Initialization error: Attempt to add same type of service twice servocetypee=" + subsys);
         serviceMap.put(subsys, service);
     }
-
-    public SubsystemService getService(String subsysId) {
+    @Override
+    public SubsystemService getSubsystemService(String subsysId) {
         Subsys subsys = Subsys.getValueOf(subsysId);
-        if (Objects.isNull(subsys)) throw new RuntimeException("Undefined subsystem subsysid=" + subsysId);
+        if (subsys.equals(Subsys.UNDEFINED)) throw new RuntimeException("Undefined subsystem subsysid=" + subsysId);
         if (!serviceMap.containsKey(subsys))
             throw new RuntimeException("Subsystem Service not set,  subsysid=" + subsysId);
         return serviceMap.get(subsys);
@@ -64,7 +53,8 @@ class IntegServiceImpl implements IntegService {
                 .collect(Collectors.toList());
         for (Model.Xref xref : toCreate) {
             try {// Call Amanda  / Hansen
-                var service = serviceMap.get(Subsys.getValueOf(xref.getXrefSystemId()));
+                Subsys subsys = Subsys.getValueOf(xref.getXrefSystemId());
+                var service = getSubsystemService(xref.getXrefSystemId());
                 var xrefPerson = service.person().create(in);
                 var xrefWithId = Model.Xref.newBuilder()
                         .setId("" + personMasterId)
@@ -83,18 +73,40 @@ class IntegServiceImpl implements IntegService {
     }
 
     @Override
-    public Optional<Model.Person> get(String id) {
+    public Optional<Model.Person> getPerson(String id) {
         System.out.println("At integServiceImpl person id=" + id);
         Optional<Model.Person> out = integDao.get((id));//Long.valueOf
         System.out.println("At integServiceImpl pers=" + out);
         return out;
     }
+    @Override
+    public Optional<Model.Person> getSubsystemPerson(Model.Xref xref){
+        var service = getSubsystemService(xref.getXrefSystemId());
+        var xrefPerson = service.person().get(xref.getXrefPersonId());
+        return xrefPerson;
+    }
+
+    private Model.Person updateSubsystemPerson(Subsys subsys , Model.Person in ){
+        var subService = getSubsystemService(subsys.toString());
+        var xrefPerson = subService.person().update(in);
+        return xrefPerson;
+    }
 
     @Override
     public Model.Person update(Model.Person in) {
         var persUpdated = integDao.update(in);
+
+        for(var xref: in.getXrefAccountsMap().values()){
+            if(xref.hasId() && xref.hasXrefSystemId() && xref.hasXrefPersonId()){
+                var subsystemPerson =IntegUtil.buildSubsystemPerson(xref, in);
+                updateSubsystemPerson(Subsys.getValueOf(xref.getXrefSystemId()), subsystemPerson);
+            }
+        }
+
         return persUpdated;//Once saved, assumed "guaranteed" return
     }
+
+
 
     void recordXref(Model.Xref in) {
         integDao.createOrUpdate(in);

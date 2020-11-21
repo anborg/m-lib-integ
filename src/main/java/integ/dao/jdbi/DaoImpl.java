@@ -19,7 +19,6 @@ public class DaoImpl implements IntegDao {
 
     /**
      * Save Person.fn ln, addr, [DO NOT SAVE XREF_IDs]
-     *
      * @param in person
      * @return id
      */
@@ -41,7 +40,6 @@ public class DaoImpl implements IntegDao {
 
         //3. Save intentions on SS-accounts in INTEG_XREF
         //forPersonInsertOrUpdateXref(personId, in);
-
         return personId;
 //        var opt= get(""+personId);
 //        var pCreated = opt.isPresent()? opt.get() : null;

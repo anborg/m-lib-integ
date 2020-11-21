@@ -11,7 +11,6 @@ import muni.service.SubsystemService;
 import org.postgresql.ds.PGSimpleDataSource;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.Random;
@@ -19,11 +18,11 @@ import java.util.Random;
 public class IntegUtil {
     public static IntegService inMem2() {
         IntegService service = withDs2(inmemDS());
-        SubsystemService amandaService = AmandaUtil.dev();
-        SubsystemService hansenService = HansenUtil.mem();
+        SubsystemService amandaService = AmandaUtil.mock();
+        SubsystemService hansenService = HansenUtil.mock();
         //TODO Be careful not to mix
-        service.setSubSystemService(Subsys.AMANDA, amandaService);
-        service.setSubSystemService(Subsys.HANSEN, hansenService);
+        service.setSubsystemService(Subsys.AMANDA, amandaService);
+        service.setSubsystemService(Subsys.HANSEN, hansenService);
 
         return service;
     }
@@ -43,15 +42,10 @@ public class IntegUtil {
     private static IntegService withDs2(DataSource ds) {
         IntegDao dao = JdbiDbUtil.getIntegDao(ds);
         return new IntegServiceImpl(dao);
-//        CRUDDao<Model.Person> personDao = JdbiDbUtil.getDao(ds, Model.Person.class);
-//        CRUDDao<Model.Xref> xrefDao = JdbiDbUtil.getDao(ds, Model.Xref.class);
-//        CRUDDao<Model.PostalAddress> addressDao = JdbiDbUtil.getDao(ds, Model.PostalAddress.class);
-//        CRUDDao<Model.Case> caseDao = JdbiDbUtil.getDao(ds, Model.Case.class);
-//        return new IntegServiceImpl(personDao,xrefDao,addressDao,caseDao);
     }
 
     @Deprecated
-    private static IntegSubsystemServiceImpl withDs(DataSource ds) {
+    private static SubsystemService withDs(DataSource ds) {
         CRUDDao<Model.Person> personDao = JdbiDbUtil.getDao(ds, Model.Person.class);
         CRUDDao<Model.Xref> xrefDao = JdbiDbUtil.getDao(ds, Model.Xref.class);
         CRUDDao<Model.PostalAddress> addressDao = JdbiDbUtil.getDao(ds, Model.PostalAddress.class);
@@ -110,7 +104,18 @@ public class IntegUtil {
         HikariDataSource hdc = new HikariDataSource(hc);
         return hdc;
     }
-
+    public static Model.Person buildSubsystemPerson(Model.Xref xref, Model.Person ofPerson) {
+        return Model.Person.newBuilder()
+                .setId(xref.getXrefPersonId())
+                .setFirstName(ofPerson.getFirstName())
+                .setLastName(ofPerson.getLastName())
+                .setEmail(ofPerson.getEmail())
+                .setPhone1(ofPerson.getPhone1())
+                .setPhone2(ofPerson.getPhone2())
+                .setAddress(ofPerson.getAddress())
+                //.putXrefAccounts()//No xref
+                .build();
+    }
 
     private static class Dummy {/*for prop file load*/
     }

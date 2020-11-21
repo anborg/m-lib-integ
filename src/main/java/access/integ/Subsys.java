@@ -2,7 +2,11 @@ package access.integ;
 
 import java.util.Arrays;
 
+/**
+ * If more subsystems are added, this enum needs change. Is there a way to avoid?
+ */
 public enum Subsys {
+    UNDEFINED("UNDEFINED"),
     AMANDA("AMANDA"),
     HANSEN("HANSEN");
 
@@ -16,7 +20,7 @@ public enum Subsys {
         var myEnum = Arrays.stream(Subsys.values())
                 .filter(enumEnv -> enumEnv.text.equals(value))
                 .findFirst();
-        return myEnum.isPresent() ? myEnum.get() : null;
+        return myEnum.isPresent() ? myEnum.get() : UNDEFINED;
     }
 
     @Override

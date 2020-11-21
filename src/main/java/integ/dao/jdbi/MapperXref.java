@@ -18,10 +18,12 @@ class MapperXref implements RowMapper<Model.Xref> {
         Model.Xref.Builder xref = Model.Xref.newBuilder();
 
         final Model.PostalAddress.Builder ab = Model.PostalAddress.newBuilder();
-        String person_id = "" + rs.getInt("id"); //TODO add to obj?
-        if(null == person_id) return null;//TODO make not of this nul return.
+        String master_PersonId = "" + rs.getLong("id"); //TODO add to obj?
+        if(null == master_PersonId) return null;//TODO make not of this nul return.
         String xref_sys_id = rs.getString("xref_sys_id");
         String xref_person_id = rs.getString("xref_person_id");
+        //set
+        Optional.ofNullable(master_PersonId).ifPresent(xref::setId);
         Optional.ofNullable(xref_sys_id).ifPresent(xref::setXrefSystemId);
         Optional.ofNullable(xref_person_id).ifPresent(xref::setXrefPersonId);
         var ts_create = Timestamps.fromSeconds(rs.getTimestamp("ts_create").toInstant().getEpochSecond());

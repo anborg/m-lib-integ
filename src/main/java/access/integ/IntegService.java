@@ -8,7 +8,11 @@ import java.util.Optional;
 public interface IntegService {
     Model.Person create(Model.Person in);
 
-    Optional<Model.Person> get(String id);
+    Optional<Model.Person> getPerson(String id);
+
+    //Only for test validation?
+    Optional<Model.Person> getSubsystemPerson(Model.Xref xref);
+
 
     Model.Person update(Model.Person in);
 
@@ -20,5 +24,7 @@ public interface IntegService {
 
     Model.Case recordIntentXref(Model.Case in, Subsys subsysType);
 
-    void setSubSystemService(Subsys amanda, SubsystemService amandaService);
+    void setSubsystemService(Subsys subsys, SubsystemService subsystemService);
+    // for testing
+    SubsystemService getSubsystemService(String subsys);
 }
