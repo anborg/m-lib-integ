@@ -1,5 +1,6 @@
 package integ.dao.jdbi;
 
+import access.integ.IntegDao;
 import muni.dao.CRUDDao;
 import muni.model.Model;
 import org.jdbi.v3.core.Jdbi;
@@ -49,19 +50,25 @@ public class JdbiDbUtil {
         return jdbi;
     }
 
+    public static IntegDao getIntegDao(DataSource ds) {
+        //if (!type.isInterface()) throw new RuntimeException("Only interface type expected");
+        return new DaoImpl(withDbPlugin(ds));
+    }
+
     public static <T> CRUDDao<T> getDao(DataSource ds, Class<T> type) {
         //if (!type.isInterface()) throw new RuntimeException("Only interface type expected");
-        if (type.getName() == Model.Person.class.getName()) {
+
+        if (type.getName().equals(Model.Person.class.getName())) {
             return (CRUDDao<T>) new DaoImplPerson(withDbPlugin(ds));
         }
-        if (type.getName() == Model.Xref.class.getName()) {
+        if (type.getName().equals(Model.Xref.class.getName())) {
             return (CRUDDao<T>) new DaoImplXref(withDbPlugin(ds));
         }
-        if (type.getName() == Model.PostalAddress.class.getName()) {
+        if (type.getName().equals(Model.PostalAddress.class.getName())) {
             return (CRUDDao<T>) new DaoImplAddress(withDbPlugin(ds));
         }
 
-        if (type.getName() == Model.Case.class.getName()) {
+        if (type.getName().equals(Model.Case.class.getName())) {
             return (CRUDDao<T>) new DaoImplCase(withDbPlugin(ds));
         }
 

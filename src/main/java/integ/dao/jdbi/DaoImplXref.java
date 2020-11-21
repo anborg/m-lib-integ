@@ -5,7 +5,6 @@ import muni.model.Model;
 import org.jdbi.v3.core.Jdbi;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 class DaoImplXref implements CRUDDao<Model.Xref> {
@@ -17,9 +16,6 @@ class DaoImplXref implements CRUDDao<Model.Xref> {
 
     @Override
     public Long create(Model.Xref xref) {
-//        if(Objects.nonNull(addrId)){
-//            return (long) jdbi.withExtension(JdbiDao.person.class, dao -> dao.insert(in, addrId));
-//        }}
         return null;
     }
 

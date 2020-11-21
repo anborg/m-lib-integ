@@ -1,196 +1,155 @@
 package access.integ;
 
+
 import muni.dao.CRUDDao;
 import muni.model.Model;
 import muni.service.SubsystemService;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
-class IntegServiceImpl implements SubsystemService {
-    PersonDA personDA;
-    AddressDA addressDA;
-    CaseDA caseDA;
+/**
+ * DO NOT make this class public.
+ * Implements integ service.
+ */
+class IntegServiceImpl implements IntegService {
+    //    CRUDDao<Model.Person> persDao;
+//    CRUDDao<Model.Xref> xrefDao;
+//    CRUDDao<Model.PostalAddress> addressDao;
+//    CRUDDao<Model.Case> caseDao;
+    IntegDao integDao;
 
 
-    public IntegServiceImpl(CRUDDao<Model.Person> persDao,CRUDDao<Model.Xref> xrefDao, CRUDDao<Model.PostalAddress> addressDao,CRUDDao<Model.Case> caseDao) {
-        this.personDA = new PersonDA(persDao, xrefDao);
-        this.addressDA = new AddressDA(addressDao);
-        this.caseDA = new CaseDA(caseDao);
+    Map<Subsys, SubsystemService> serviceMap = new HashMap<>();
+
+    public IntegServiceImpl(IntegDao integDao) {
+        this.integDao = integDao;
+    }
+
+    public IntegServiceImpl(CRUDDao<Model.Person> persDao, CRUDDao<Model.Xref> xrefDao, CRUDDao<Model.PostalAddress> addressDao, CRUDDao<Model.Case> caseDao) {
+//        this.persDao = persDao;
+//        this.xrefDao = xrefDao;
+//        this.addressDao = addressDao;
+//        this.caseDao = caseDao;
     }
 
     @Override
-    public SubsystemDataAccess<Model.Person> person() {
-        return personDA;
+    public void setSubSystemService(Subsys subsys, SubsystemService service) {
+        if (serviceMap.containsKey(subsys))
+            throw new RuntimeException("Initialization error: Attempt to add same type of service twice servocetypee=" + subsys);
+        serviceMap.put(subsys, service);
     }
-    @Override
-    public SubsystemDataAccess<Model.PostalAddress> address() {
-        return addressDA;
-    }
-    @Override
-    public SubsystemDataAccess<Model.Case> ccase() {
-        return caseDA;
-    }
-}//IntegServiceImpl
 
+    public SubsystemService getService(String subsysId) {
+        Subsys subsys = Subsys.getValueOf(subsysId);
+        if (Objects.isNull(subsys)) throw new RuntimeException("Undefined subsystem subsysid=" + subsysId);
+        if (!serviceMap.containsKey(subsys))
+            throw new RuntimeException("Subsystem Service not set,  subsysid=" + subsysId);
+        return serviceMap.get(subsys);
+    }
 
-// Just grouping all Person Data access in one place {save/update/get/find/recent}
-class  PersonDA implements SubsystemService.SubsystemDataAccess<Model.Person>{
-    CRUDDao<Model.Person> daoPers;
-    CRUDDao<Model.Xref> daoXref;
-    public PersonDA(CRUDDao<Model.Person> daoPers,CRUDDao<Model.Xref> daoXref){this.daoPers = daoPers;this.daoXref = daoXref;}
     @Override
     public Model.Person create(Model.Person in) {
-        Long id = daoPers.create(in);
+        //First save person name, address, get person_id
+        Long personMasterId = integDao.create(in);
+//        Optional<Model.Person> opt = persDao.get(id);
+//        opt.isPresent();//dummy call, find cleaner solution
+//        Model.Person fromdb = opt.get();
+
+
         //4. TODO Command-SS to create those accounts - api calls
         //5. TODO Update SS-personId to subbaccounts in INTEG_XREF
-        return daoPers.get(id).get();//Once saved, assumed "guaranteed" return
+        List<Model.Xref> toCreate = in.getXrefAccountsMap().values().stream()
+                .filter(xref -> xref.hasXrefPersonId() == false) // subsystem not called.
+                .collect(Collectors.toList());
+        for (Model.Xref xref : toCreate) {
+            try {// Call Amanda  / Hansen
+                var service = serviceMap.get(Subsys.getValueOf(xref.getXrefSystemId()));
+                var xrefPerson = service.person().create(in);
+                var xrefWithId = Model.Xref.newBuilder()
+                        .setId("" + personMasterId)
+                        .setXrefSystemId(xref.getXrefSystemId())//Was a bug here.
+                        .setXrefPersonId(xrefPerson.getId()).build();
+                Long id = integDao.createOrUpdate(xrefWithId);
+                System.out.println("Xref inserted id=" + id);
+            } catch (Exception e) {
+                //TODO if call to subsystem fails, just ignore, as a backend thread may handle it.
+                System.out.println(e.getMessage());
+                throw e;
+            }
+        }
+        Model.Person out = integDao.get("" + personMasterId).get();//Once saved, assumed "guaranteed" return
+        return out;
     }
-    @Override
-    public Model.Person update(Model.Person in) {
-        Long id = daoPers.update(in);
-        return daoPers.get(id).get();//Once saved, assumed "guaranteed" return
-    }
+
     @Override
     public Optional<Model.Person> get(String id) {
         System.out.println("At integServiceImpl person id=" + id);
-        Optional<Model.Person> out = daoPers.get(Long.valueOf(id));
+        Optional<Model.Person> out = integDao.get((id));//Long.valueOf
         System.out.println("At integServiceImpl pers=" + out);
         return out;
     }
 
     @Override
-    public List<Model.Person> find(Model.Person person) {
-        List<Model.Person> out = daoPers.getAll();//TODO change later
-        return out;
+    public Model.Person update(Model.Person in) {
+        var persUpdated = integDao.update(in);
+        return persUpdated;//Once saved, assumed "guaranteed" return
+    }
+
+    void recordXref(Model.Xref in) {
+        integDao.createOrUpdate(in);
     }
 
     @Override
-    public List<Model.Person> recent() {
-        List<Model.Person> out = daoPers.getAll();//TODO change later
-        return out;
+    public Model.Person recordIntentXref(Model.Person in, Subsys subsysType) {
+        // add to XREF_PERSON table
+        // call subsys to add Person.
+        //
+        Optional<Model.Person> optSubSysPerson = Optional.empty();
+        try {
+            switch (subsysType) {
+                case AMANDA:
+                    //subsysPerson = amdService.create(in);//call amanda lib
+                    break;
+                case HANSEN:
+                    //subsysPerson = hanService.create(in);//call hansen lib
+                default:
+                    throw new UnsupportedOperationException("Subsystm id not expected");
+            }
+        } catch (UnsupportedOperationException e) {
+            throw e; // only wrong subsysId need to be
+        } catch (Exception e) {
+            //Error on subsystem-call [e.g Hansen down] need to be logged (not thrown). And can be rectified scheduled scripts
+            //log.error()
+            e.printStackTrace();
+        }
+        // add to XREF_PERSON table
+        if (optSubSysPerson.isPresent()) {
+            var ssPersId = optSubSysPerson.get().getId();
+
+        } else {
+
+        }
+        return null;
     }
-}
 
 
-// Just grouping all Case Data access in one place {save/update/get/find/recent}
-class  AddressDA implements SubsystemService.SubsystemDataAccess<Model.PostalAddress>{
-    CRUDDao<Model.PostalAddress> dao;
-    public AddressDA(CRUDDao<Model.PostalAddress> dao){this.dao=dao;}
     @Override
-    public Model.PostalAddress create(Model.PostalAddress in) {
-        long id = dao.create(in);
-        return dao.get(id).get();//Once saved, assumed "guaranteed" return
-    }
-    @Override
-    public Model.PostalAddress update(Model.PostalAddress in) {
-        long id = dao.update(in);
-        return dao.get(id).get();//Once saved, assumed "guaranteed" return
-    }
-    @Override
-    public Optional<Model.PostalAddress> get(String id) {
-        System.out.println("At integServiceImpl person id=" + id);
-        Optional<Model.PostalAddress> out = dao.get(Long.valueOf(id));
-        System.out.println("At integServiceImpl pers=" + out);
-        return out;
-    }
-
-    @Override
-    public List<Model.PostalAddress> find(Model.PostalAddress in) {
-        List<Model.PostalAddress> out = dao.getAll();//TODO change later
-        return out;
-    }
-
-    @Override
-    public List<Model.PostalAddress> recent() {
-        List<Model.PostalAddress> out = dao.getAll();//TODO change later
-        return out;
-    }
-}
-// Just grouping all Case Data access in one place {save/update/get/find/recent}
-class  CaseDA implements SubsystemService.SubsystemDataAccess<Model.Case>{
-    CRUDDao<Model.Case> dao;
-    public CaseDA(CRUDDao<Model.Case> dao){}
-    @Override
-    public Model.Case create(Model.Case aCase) {
-        throw new UnsupportedOperationException("Please get it implemented");
-    }
-    @Override
-    public Model.Case update(Model.Case aCase) {
-        throw new UnsupportedOperationException("Please get it implemented");
-    }
-
-    @Override
-    public Optional<Model.Case> get(String id) {
-        return Optional.empty();
-    }
-
-    @Override
-    public List<Model.Case> find(Model.Case aCase) {
+    public Model.Case create(Model.Case in) {
+        //Person  - create: save Person name/address
         return null;
     }
 
     @Override
-    public List<Model.Case> recent() {
+    public Model.Case update(Model.Case in) {
+        //Person  - create: save Person name/address
         return null;
     }
+
+    @Override
+    public Model.Case recordIntentXref(Model.Case in, Subsys subsysType) {
+        // If a case must be resolved in subsystems
+        return null;
+    }
+
 }
-
-
-
-
-//
-//    //Person ------------------------------------
-//    @Override //TODO Priority-1
-//    public Model.Person save(Model.Person in) {
-//        long id = personDao.save(in);
-//        return personDao.getById(id).get();//Once saved, assumed "guaranteed" return
-//    }
-//
-//    @Override
-//    public Optional<Model.Person> getPerson(String id) { // Translate integ: string-id to hansen int-id
-//        System.out.println("At integServiceImpl person id=" +id);
-//        Optional<Model.Person> out = personDao.getById(Long.valueOf(id));
-//        System.out.println("At integServiceImpl pers=" +out);
-//        return out;
-//    }
-//    @Override
-//    public List<Model.Person> getPersonsRecent() { // Translate integ: string-id to hansen int-id
-//        List<Model.Person> out = personDao.getAll();
-//        return out;
-//    }
-//
-//    @Override
-//    public List<Model.Person> findPerson(Model.Person person) {
-//        List<Model.Person> out = new ArrayList();
-//        out.add(MockUtil.buildPerson());
-//        return out;
-//    }
-//
-//    @Override
-//    public Optional<Model.PostalAddress> getPostalAddress(String id) {
-//        return Optional.ofNullable(MockUtil.buildAddress());
-//    }
-//
-//    @Override
-//    public Model.PostalAddress createPostalAddress(String s) {
-//        return MockUtil.buildAddress();
-//    }
-//    //Case ------------------------------------
-//
-//
-//    @Override //TODO Priority-2
-//    public Model.Case save(Model.Case in) {
-//        throw new UnsupportedOperationException("Please get it implemented");
-//    }
-//
-//
-//    @Override
-//    public Optional<Model.Case> getCase(String s) {
-//        return null;
-//    }
-//
-//    @Override
-//    public List<Model.Case> findCase(Model.Case aCase) {
-//        return null;
-//    }

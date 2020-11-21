@@ -1,4 +1,4 @@
-package access.integ;
+package integ.dao.jdbi;
 
 public interface Queries {
     String sql_person_select_all = "select\n" +

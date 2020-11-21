@@ -1,5 +1,7 @@
 package access.integ;
 
+import access.amanda.AmandaUtil;
+import access.hansen.HansenUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import integ.dao.jdbi.JdbiDbUtil;
@@ -15,18 +17,52 @@ import java.util.Properties;
 import java.util.Random;
 
 public class IntegUtil {
+    public static IntegService inMem2() {
+        IntegService service = withDs2(inmemDS());
+        SubsystemService amandaService = AmandaUtil.dev();
+        SubsystemService hansenService = HansenUtil.mem();
+        //TODO Be careful not to mix
+        service.setSubSystemService(Subsys.AMANDA, amandaService);
+        service.setSubSystemService(Subsys.HANSEN, hansenService);
+
+        return service;
+    }
+
     // Use for junit
-    public static SubsystemService inMem() {return withDs(inmemDS());}
+    @Deprecated
+    public static SubsystemService inMem() {
+        return withDs(inmemDS());
+    }
+
     // Use for integ-test
-    public static SubsystemService dev() {return withDs(devDS());}
+    @Deprecated
+    public static SubsystemService dev() {
+        return withDs(devDS());
+    }
 
+    private static IntegService withDs2(DataSource ds) {
+        IntegDao dao = JdbiDbUtil.getIntegDao(ds);
+        return new IntegServiceImpl(dao);
+//        CRUDDao<Model.Person> personDao = JdbiDbUtil.getDao(ds, Model.Person.class);
+//        CRUDDao<Model.Xref> xrefDao = JdbiDbUtil.getDao(ds, Model.Xref.class);
+//        CRUDDao<Model.PostalAddress> addressDao = JdbiDbUtil.getDao(ds, Model.PostalAddress.class);
+//        CRUDDao<Model.Case> caseDao = JdbiDbUtil.getDao(ds, Model.Case.class);
+//        return new IntegServiceImpl(personDao,xrefDao,addressDao,caseDao);
+    }
 
-    private static String inmemDbUrl_anon_one_connection(){
-        String INMEM_DB_URL = "jdbc:h2:mem:;"+
-        "INIT=RUNSCRIPT FROM 'classpath:integ/schema.sql'\\;" +
+    @Deprecated
+    private static IntegSubsystemServiceImpl withDs(DataSource ds) {
+        CRUDDao<Model.Person> personDao = JdbiDbUtil.getDao(ds, Model.Person.class);
+        CRUDDao<Model.Xref> xrefDao = JdbiDbUtil.getDao(ds, Model.Xref.class);
+        CRUDDao<Model.PostalAddress> addressDao = JdbiDbUtil.getDao(ds, Model.PostalAddress.class);
+        CRUDDao<Model.Case> caseDao = JdbiDbUtil.getDao(ds, Model.Case.class);
+        return new IntegSubsystemServiceImpl(personDao, xrefDao, addressDao, caseDao);
+    }
+
+    private static String inmemDbUrl_anon_one_connection() {
+        String INMEM_DB_URL = "jdbc:h2:mem:;" +
+                "INIT=RUNSCRIPT FROM 'classpath:integ/schema.sql'\\;" +
                 "RUNSCRIPT FROM 'classpath:integ/data.sql'";
-
-
         return INMEM_DB_URL;
     }
 
@@ -51,8 +87,6 @@ public class IntegUtil {
             ds.setCurrentSchema(schemaname);
             ds.setUser(user);
             ds.setPassword(pwd);
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -65,7 +99,7 @@ public class IntegUtil {
 
     public static DataSource inmemDS() {
         final Properties props = new Properties();
-        org.h2.jdbcx.JdbcDataSource ds = null;
+        org.h2.jdbcx.JdbcDataSource ds ;
         ds = new org.h2.jdbcx.JdbcDataSource();
         ds.setURL(inmemDbUrl_anon_one_connection());
         ds.setUser("sa");
@@ -75,15 +109,6 @@ public class IntegUtil {
         hc.setMaximumPoolSize(2);
         HikariDataSource hdc = new HikariDataSource(hc);
         return hdc;
-    }
-
-
-    private static IntegServiceImpl withDs(DataSource ds){
-        CRUDDao<Model.Person> personDao = JdbiDbUtil.getDao(ds, Model.Person.class);
-        CRUDDao<Model.Xref> xrefDao = JdbiDbUtil.getDao(ds, Model.Xref.class);
-        CRUDDao<Model.PostalAddress> addressDao = JdbiDbUtil.getDao(ds, Model.PostalAddress.class);
-        CRUDDao<Model.Case> caseDao = JdbiDbUtil.getDao(ds, Model.Case.class);
-        return new IntegServiceImpl(personDao,xrefDao,addressDao,caseDao);
     }
 
 

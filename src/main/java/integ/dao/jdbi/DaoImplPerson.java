@@ -5,7 +5,6 @@ import muni.model.Model;
 import muni.util.DataQuality;
 import org.jdbi.v3.core.Jdbi;
 
-import javax.swing.text.html.Option;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -30,13 +29,13 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
 //            //System.out.println(p);
 //            return p;
 //        });
-        var optPerson= jdbi.withExtension(JdbiDao.person.class, dao -> { return dao.get(id); });
-        List<Model.Xref> xref = optPerson.isPresent()? jdbi.withExtension(JdbiDao.xref.class, dao -> {return dao.getXrefPerson(id);}) : List.of();
+        var optPerson= jdbi.withExtension(JdbiDao.person.class, dao -> dao.get(id));
+        List<Model.Xref> xref = optPerson.isPresent()? jdbi.withExtension(JdbiDao.xref.class, dao -> dao.getXrefPerson(id)) : List.of();
         if(xref.isEmpty()){
             return optPerson;
         }else{
             var pBuilder = Model.Person.newBuilder(optPerson.get());
-            xref.forEach(x -> pBuilder.putXrefAccounts(x.getXrefSubsysId(), x));
+            xref.forEach(x -> pBuilder.putXrefAccounts(x.getXrefSystemId(), x));
             return Optional.of(pBuilder.build());
         }
     }
@@ -48,7 +47,7 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
         //1. Save the address.
         Long addrId = handleAddress(in);
         //2. Save person details
-        Long personId = null;
+        Long personId;
         if(Objects.nonNull(addrId)){
             personId =  jdbi.withExtension(JdbiDao.person.class, dao -> dao.insert(in, addrId));
         }else{
@@ -59,9 +58,8 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
         return personId;
     }
     private void handleXref(final Long personId, Model.Person in){
-        in.getXrefAccountsMap().values().forEach( xref -> {
-            jdbi.withExtension(JdbiDao.xref.class, dao -> dao.insert(personId, xref));
-        });
+        in.getXrefAccountsMap().values()
+                .forEach( xref -> jdbi.withExtension(JdbiDao.xref.class, dao -> dao.insert(personId, xref)));
     }
     @Override
     public Long update(Model.Person in) {
@@ -71,7 +69,7 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
 
         if (isValidForUpdate) {//update
             if(Objects.nonNull(addrId)){
-                return (long) jdbi.withExtension(JdbiDao.person.class, dao -> dao.update(in, addrId));
+                return jdbi.withExtension(JdbiDao.person.class, dao -> dao.update(in, addrId));
             }
             return jdbi.withExtension(JdbiDao.person.class, dao -> dao.update(in));
         } else {

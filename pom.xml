@@ -29,7 +29,16 @@
       <version>${muni-model.version}</version>
       <scope>compile</scope>
     </dependency>
-
+    <dependency>
+      <groupId>m</groupId>
+      <artifactId>lib-amanda</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>m</groupId>
+      <artifactId>lib-hansen</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
     <dependency>
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi3-core</artifactId>
@@ -38,10 +47,10 @@
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi3-sqlobject</artifactId>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>org.jdbi</groupId>-->
-<!--      <artifactId>jdbi3-oracle12</artifactId>-->
-<!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>org.jdbi</groupId>-->
+    <!--      <artifactId>jdbi3-oracle12</artifactId>-->
+    <!--    </dependency>-->
     <dependency>
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi3-postgres</artifactId>
@@ -118,7 +127,7 @@
         <configuration>
           <systemPropertyVariables>
             <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-            <maven.home>${maven.home}</maven.home>
+            <!--            <maven.home>${maven.home}</maven.home>-->
           </systemPropertyVariables>
         </configuration>
       </plugin>
