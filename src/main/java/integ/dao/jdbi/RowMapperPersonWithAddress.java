@@ -12,7 +12,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 //mapper -- THe order of building may need to follow this standard pattern.
-class MapperPersonWithAddress implements RowMapper<Model.Person> {
+@Deprecated
+class RowMapperPersonWithAddress implements RowMapper<Model.Person> {
     @Override
     public Model.Person map(ResultSet rs, StatementContext ctx) throws SQLException {
         Timestamp ts = Timestamps.fromSeconds(rs.getTimestamp("ts_create").toInstant().getEpochSecond());
@@ -21,7 +22,7 @@ class MapperPersonWithAddress implements RowMapper<Model.Person> {
         final Model.PostalAddress.Builder ab = Model.PostalAddress.newBuilder();
         String id = "" + rs.getInt("id");
         System.out.println("Retrieved person id : " + id);
-        if(null == id) return null;//TODO make not of this nul return.
+        if (null == id) return null;//TODO make not of this nul return.
         //build address
         String address_id = rs.getString("address_id");
 

@@ -64,7 +64,7 @@ public class TestIntegService {
 
         assertThat(amdXref_fromdb).extracting(Model.Xref::getXrefSystemId)
                 .containsExactly(amdXref.getXrefSystemId());
-        assertThat(amdXref_fromdb.getXrefPersonId()).isNotNull();
+        assertThat(amdXref_fromdb.getXrefId()).isNotNull();
     }
 
 

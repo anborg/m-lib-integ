@@ -18,7 +18,7 @@ public class TestIntegService2 {
 
     @BeforeEach
     public void setup() {
-        service = IntegUtil.inMem2();
+        service = IntegUtil.mock();
     }
 
     public Model.Person createCustomer() { // Tests create and get
@@ -49,11 +49,12 @@ public class TestIntegService2 {
     @Test
     public void person_changes_must_syc_to_ALL_SUBSYSTEMS_amanda() {
         var amdXref = Model.Xref.newBuilder().setXrefSystemId(Subsys.AMANDA.toString()).build();
+        var hansenXref = Model.Xref.newBuilder().setXrefSystemId(Subsys.HANSEN.toString()).build();
         Model.Person c1_new = Model.Person.newBuilder()
                 .setFirstName("Bob").setLastName("Fork")
                 .setEmail("bob@gmail.com")
                 .putXrefAccounts(amdXref.getXrefSystemId(), amdXref)
-                //.putXrefAccounts("HANSEN", null)
+                .putXrefAccounts(hansenXref.getXrefSystemId(), hansenXref)
                 .build();
         //valid?
         assertThat(DataQuality.Person.isValidForInsert(c1_new)).isTrue();
@@ -66,17 +67,17 @@ public class TestIntegService2 {
         //check xref
         var amdXref_fromdb = c1_fromdb.getXrefAccountsMap().get(amdXref.getXrefSystemId());
         assertThat(amdXref_fromdb).isNotNull();
-        assertThat(amdXref_fromdb).extracting(Model.Xref::getXrefSystemId, Model.Xref::getId, Model.Xref::getXrefPersonId)
-                .containsExactly(amdXref.getXrefSystemId(), c1_fromdb.getId(), amdXref_fromdb.getXrefPersonId());
-        assertThat(amdXref_fromdb.getXrefPersonId()).isNotNull();
+        assertThat(amdXref_fromdb).extracting(Model.Xref::getXrefSystemId, Model.Xref::getId, Model.Xref::getXrefId)
+                .containsExactly(amdXref.getXrefSystemId(), c1_fromdb.getId(), amdXref_fromdb.getXrefId());
+        assertThat(amdXref_fromdb.getXrefId()).isNotNull();
 
         //Verofu update
         update_and_verify(c1_fromdb);
 
     }
     //This method assumes
-    private void update_and_verify(Model.Person in){
-        String updatedLastName = in.getLastName()+ "Jimmy";
+    private void update_and_verify(Model.Person in) {
+        String updatedLastName = in.getLastName() + "Jimmy";
         var person = Model.Person.newBuilder(in).setLastName(updatedLastName).build();
         //update
         var integPerson_fromdb = service.update(person);
@@ -85,15 +86,14 @@ public class TestIntegService2 {
         //verify lastname in integ obj
         assertThat(integPerson_fromdb).extracting(Model.Person::getLastName).containsExactly(updatedLastName);
 
-        //verify lastname propagated to amanda
-        Subsys amanda = Subsys.AMANDA;
-        var amdService = service.getSubsystemService(amanda.toString());
-        var amdXref = integPerson_fromdb.getXrefAccountsMap().get(amanda.toString());
-        assertThat(amdXref).isNotNull();
-        var xrefPerson = service.getSubsystemPerson(amdXref).get();
-        assertThat(xrefPerson)
-                .extracting(Model.Person::getId, Model.Person::getLastName)
-                .containsExactly(amdXref.getXrefPersonId(), updatedLastName);
+        //verify lastname propagated to all subsystems
+        for (var xref : integPerson_fromdb.getXrefAccountsMap().values()) {
+            var xrefPerson = service.getSubsystemPerson(xref).get();
+            assertThat(xrefPerson).as("Verify Person updates in xref system=" + xref.getXrefSystemId())
+                    .extracting(Model.Person::getId, Model.Person::getLastName)
+                    .containsExactly(xref.getXrefId(), updatedLastName);
+        }
+
     }
 
 

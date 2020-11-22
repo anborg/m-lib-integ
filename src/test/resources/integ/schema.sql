@@ -39,7 +39,7 @@ CREATE TABLE integ.INTEG_XREF_PERSON ( -- contact_channels.postalAddress
     , xref_person_id VARCHAR(30)
     , ts_create TIMESTAMP  without time zone NOT NULL DEFAULT (current_timestamp AT TIME ZONE 'UTC')
     , ts_update TIMESTAMP  without time zone NOT NULL DEFAULT (current_timestamp AT TIME ZONE 'UTC')
-    , ts_ss_refreshed TIMESTAMP  without time zone NOT NULL DEFAULT (current_timestamp AT TIME ZONE 'UTC')
+    , ts_refreshed TIMESTAMP  without time zone NOT NULL DEFAULT (current_timestamp AT TIME ZONE 'UTC')
     ,PRIMARY KEY (id,xref_sys_id) --,xref_person_id
 );
 --insert into integ.INTEG_ADDRESS (streetnum, streetname, city, country, postalcode)

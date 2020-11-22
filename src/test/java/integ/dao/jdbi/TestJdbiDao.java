@@ -1,12 +1,14 @@
 package integ.dao.jdbi;
 
 import access.integ.IntegUtil;
+import access.integ.Subsys;
 import muni.model.Model;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -24,13 +26,16 @@ public class TestJdbiDao {
 
     @Test
     public void testDao_CRUD() {
+
         final var pi_addr = Model.PostalAddress.newBuilder().setStreetNum("111").setStreetName("My street").setCity("Avenly").setPostalCode("L1L0Z0").build();
+        final var p1_xref_amanda = Model.Xref.newBuilder().setXrefSystemId(Subsys.AMANDA.toString()).build();
         final var p1 = Model.Person.newBuilder().setFirstName("Alice").setLastName("Doe")
                 .setEmail("alice@gmail.com")//To PERSON table
                 .setPhone1("12345678")//To PERSON table
                 .setPhone2("12345678")//To PERSON table
                 //To ADDRES table
                 .setAddress(pi_addr)
+                .putXrefAccounts(p1_xref_amanda.getXrefSystemId(), p1_xref_amanda)
                 .build();
         final var p2 = Model.Person.newBuilder().setFirstName("Clarice").setLastName("Stuck").setEmail("claricee@gmail.com").build();
         final var p3 = Model.Person.newBuilder().setFirstName("Delete").setLastName("Me").setEmail("me@gmail.com").build();
@@ -38,28 +43,33 @@ public class TestJdbiDao {
         //start clean
         jdbi.useExtension(JdbiDao.person.class, dao -> dao.deleteAll());
         //when
-        List<Model.Person> persons = jdbi.withExtension(JdbiDao.person.class, dao -> {
+        List<Model.Person.Builder> personsB = jdbi.withExtension(JdbiDao.person.class, persDao -> {
             //insert - address
-            Long id_ofP1_a1 = jdbi.withExtension(JdbiDao.address.class, dao1 -> {
-                return dao1.insert(p1.getAddress());
-            });
+            Long id_ofP1_a1 = jdbi.withExtension(JdbiDao.address.class, addrDao -> addrDao.insert(p1.getAddress()));
 
             System.out.println("Addr id id_ofP1_a1=" + id_ofP1_a1);
             //insert - person with address
-            Long id_ofP1 = dao.insert(p1, id_ofP1_a1);
+            Long id_ofP1 = persDao.insert(p1, id_ofP1_a1);
+            Long id_ofP1_xamanda = jdbi.withExtension(JdbiDao.xref.class, xrefDao -> xrefDao.insert(id_ofP1, p1_xref_amanda));
+
             //insert - person without address
-            Long id_ofP2 = dao.insert(p2);
-            Long id_ofP3 = dao.insert(p3);
+            Long id_ofP2 = persDao.insert(p2);
+            Long id_ofP3 = persDao.insert(p3);
             System.out.println(id_ofP1 + ", " + id_ofP2 + ", " + id_ofP3);
-            final Optional<Model.Person> p2Select = dao.get(id_ofP2);
+            final Optional<Model.Person.Builder> p1Select = persDao.get(id_ofP1);
+            //check - inserted object is in db
+            assertThat(p1Select.isPresent()).isTrue();
+
+            final Optional<Model.Person.Builder> p2Select = persDao.get(id_ofP2);
             //check - inserted object is in db
             assertThat(p2Select.isPresent()).isTrue();
+
             //update - person
-            final var p2_updated = Model.Person.newBuilder(p2Select.get()).setLastName("Dummy").build();
-            long id_p2 = dao.update(p2_updated);
+            final var p2_updated = p2Select.get().setLastName("Dummy").build();
+            long id_p2 = persDao.update(p2_updated);
             //select - person id_ofP1
-            final var optp1_fromdb = dao.get(id_ofP1);
-            Model.Person p1_fromdb = optp1_fromdb.get(); //TODO unpreditable error so adding prev line.
+            final var optp1_fromdb = persDao.get(id_ofP1);
+            Model.Person.Builder p1_fromdb = optp1_fromdb.get(); //TODO unpreditable error so adding prev line.
             //verify p1 is in db
             assertThat(p1_fromdb).isNotNull();
             //verify p1 addr is in db
@@ -67,8 +77,8 @@ public class TestJdbiDao {
             //check - addr values present
             assertThat(p1_addr_fromdb).isNotNull();
             assertThat(p1_addr_fromdb)
-                    .extracting(Model.PostalAddress::getStreetNum, Model.PostalAddress::getStreetName,Model.PostalAddress::getPostalCode, Model.PostalAddress::getCity, Model.PostalAddress::getCountry, Model.PostalAddress::getLat, Model.PostalAddress::getLon )
-                    .containsExactly(pi_addr.getStreetNum(), pi_addr.getStreetName(),pi_addr.getPostalCode(), pi_addr.getCity(), pi_addr.getCountry(), pi_addr.getLat(), pi_addr.getLon() );
+                    .extracting(Model.PostalAddress::getStreetNum, Model.PostalAddress::getStreetName, Model.PostalAddress::getPostalCode, Model.PostalAddress::getCity, Model.PostalAddress::getCountry, Model.PostalAddress::getLat, Model.PostalAddress::getLon)
+                    .containsExactly(pi_addr.getStreetNum(), pi_addr.getStreetName(), pi_addr.getPostalCode(), pi_addr.getCity(), pi_addr.getCountry(), pi_addr.getLat(), pi_addr.getLon());
             //check - addr generic inserted obj looks like.
             assertThat(p1_addr_fromdb.getId()).isNotEmpty();
             assertThat(p1_addr_fromdb.getId()).isNotNull();
@@ -83,16 +93,19 @@ public class TestJdbiDao {
             assertThat(p1_fromdb.hasUpdateTime()).isTrue();
 
             //delete - person3
-            dao.delete(id_ofP3);
+            persDao.delete(id_ofP3);
             //check - deleted obj is null
-            Optional<Model.Person> p3_delselect = dao.get(id_ofP3);
+            Optional<Model.Person.Builder> p3_delselect = persDao.get(id_ofP3);
             assertThat(p3_delselect.isPresent()).isFalse();
             //assertThat(p3_delselect.get()).isNull();//NoSuchElementException: No value present
 
-            return dao.getAll();
+            return persDao.getAll();
+
+
         });//useExtension
         //then
         //asserting - example test at field level
+        List<Model.Person> persons = personsB.stream().map(b -> b.build()).collect(Collectors.toList());
         assertThat(persons)
                 .extracting(Model.Person::getFirstName, Model.Person::getLastName)
                 .containsExactly(
@@ -101,5 +114,6 @@ public class TestJdbiDao {
                 );
 
         //System.out.println(persons);
+
     }
 }//testjdbc

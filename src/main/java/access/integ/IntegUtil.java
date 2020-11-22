@@ -16,7 +16,7 @@ import java.util.Properties;
 import java.util.Random;
 
 public class IntegUtil {
-    public static IntegService inMem2() {
+    public static IntegService mock() {
         IntegService service = withDs2(inmemDS());
         SubsystemService amandaService = AmandaUtil.mock();
         SubsystemService hansenService = HansenUtil.mock();
@@ -34,9 +34,8 @@ public class IntegUtil {
     }
 
     // Use for integ-test
-    @Deprecated
-    public static SubsystemService dev() {
-        return withDs(devDS());
+    public static IntegService dev() {
+        return withDs2(devDS());
     }
 
     private static IntegService withDs2(DataSource ds) {
@@ -106,7 +105,7 @@ public class IntegUtil {
     }
     public static Model.Person buildSubsystemPerson(Model.Xref xref, Model.Person ofPerson) {
         return Model.Person.newBuilder()
-                .setId(xref.getXrefPersonId())
+                .setId(xref.getXrefId())
                 .setFirstName(ofPerson.getFirstName())
                 .setLastName(ofPerson.getLastName())
                 .setEmail(ofPerson.getEmail())

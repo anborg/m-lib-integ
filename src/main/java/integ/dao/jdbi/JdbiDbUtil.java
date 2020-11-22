@@ -16,8 +16,9 @@ public class JdbiDbUtil {
     private static void common(Jdbi jdbi) {
         jdbi.installPlugin(new SqlObjectPlugin())
                 //common mappers
-                .registerRowMapper(new MapperPersonWithAddress())
-                .registerRowMapper(new MapperXref())
+                .registerRowMapper(new RowMapperPerson())
+                .registerRowMapper(new RowMapperAddress())
+                .registerRowMapper(new RowMapperXref())
         ;
     }
 
@@ -55,6 +56,7 @@ public class JdbiDbUtil {
         return new DaoImpl(withDbPlugin(ds));
     }
 
+    @Deprecated
     public static <T> CRUDDao<T> getDao(DataSource ds, Class<T> type) {
         //if (!type.isInterface()) throw new RuntimeException("Only interface type expected");
 

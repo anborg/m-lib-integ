@@ -9,8 +9,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("deprecation")
+@Deprecated
 class DaoImplPerson implements CRUDDao<Model.Person> {
 
     Jdbi jdbi;
@@ -30,14 +32,15 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
 //            return p;
 //        });
         var optPerson= jdbi.withExtension(JdbiDao.person.class, dao -> dao.get(id));
-        List<Model.Xref> xref = optPerson.isPresent()? jdbi.withExtension(JdbiDao.xref.class, dao -> dao.getXrefPerson(id)) : List.of();
-        if(xref.isEmpty()){
-            return optPerson;
-        }else{
-            var pBuilder = Model.Person.newBuilder(optPerson.get());
+        return optPerson.map(builder -> builder.build());
+        /*List<Model.Xref> xref = optPerson.isPresent()? jdbi.withExtension(JdbiDao.xref.class, dao -> dao.getXrefPerson(id)) : List.of();
+        //if(xref.isEmpty()){
+            return optPerson.map(builder -> builder.build());
+        }else {
+            var pBuilder = optPerson.get();
             xref.forEach(x -> pBuilder.putXrefAccounts(x.getXrefSystemId(), x));
-            return Optional.of(pBuilder.build());
-        }
+            return Optional.of(pBuilder.build()); //Must be decomissioned.
+        }*/
     }
 
     @Override
@@ -126,7 +129,7 @@ class DaoImplPerson implements CRUDDao<Model.Person> {
     }
     @Override
     public List<Model.Person> getAll() {
-        return jdbi.withExtension(JdbiDao.person.class, JdbiDao.person::getAll);
+        return jdbi.withExtension(JdbiDao.person.class, JdbiDao.person::getAll).stream().map(b -> b.build()).collect(Collectors.toList());
     }
 
     @Override

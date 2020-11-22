@@ -9,6 +9,7 @@ import org.jdbi.v3.core.Jdbi;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class DaoImpl implements IntegDao {
     Jdbi jdbi;
@@ -50,17 +51,23 @@ public class DaoImpl implements IntegDao {
     public Optional<Model.Person> get(String id) {
         Long idLong = Long.valueOf(id);
         var optPerson = jdbi.withExtension(JdbiDao.person.class, dao -> dao.get(idLong));
-        List<Model.Xref> xref = List.of();
-        if (optPerson.isPresent()) xref = jdbi.withExtension(JdbiDao.xref.class, dao -> dao.getXrefPerson(idLong));
-
-        if (xref.isEmpty()) {
-            return optPerson;
-        } else {
-            var pBuilder = Model.Person.newBuilder(optPerson.get());
-            xref.forEach(x -> pBuilder.putXrefAccounts(x.getXrefSystemId(), x));
-            return Optional.of(pBuilder.build());
-        }
+        return optPerson.map(b-> b.build());
+//        List<Model.Xref> xref = List.of();
+//        if (optPerson.isPresent()) xref = jdbi.withExtension(JdbiDao.xref.class, dao -> dao.getXrefPerson(idLong));
+//
+//        if (xref.isEmpty()) {
+//            return optPerson.map(b -> b.build());
+//        } else {
+//            var pBuilder = optPerson.get();
+//            xref.forEach(x -> pBuilder.putXrefAccounts(x.getXrefSystemId(), x));//No separate Xref, use LEFTJOIN
+//            //return Optional.of(pBuilder.build()); //Made to fail.
+//        }
     }
+
+    public List<Model.Person> getRecentPersons() {
+        return jdbi.withExtension(JdbiDao.person.class, dao -> dao.getAll()).stream().map(b -> b.build()).collect(Collectors.toList());
+    }
+
 
     @Override
     public Model.Person update(Model.Person in) {

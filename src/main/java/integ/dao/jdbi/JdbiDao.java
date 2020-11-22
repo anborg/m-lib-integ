@@ -7,48 +7,26 @@ import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import org.jdbi.v3.sqlobject.statement.UseRowReducer;
 
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-//@RegisterBeanMapper(MapperPersonWithAddress.class) //DO NOT ADD mapper at class level. Add at method level //TODO make note.
+//@RegisterBeanMapper(RowMapperPersonWithAddress.class) //DO NOT ADD mapper at class level. Add at method level //TODO make note.
 interface JdbiDao {//extends CRUDDao<Model.Person>
 
-    //    @GetGeneratedKeys
-//    @SqlUpdate("INSERT INTO integ.INTEG_PERSON(firstname, lastname, email, phone1, phone2 VALUES ( :firstName, :lastName, :email, :phone1, :phone2)")
-//    Long insert(@BindBean Model.Person in);
-    interface xref {
-        @Transactional
-        @GetGeneratedKeys
-        @SqlUpdate("insert into integ.INTEG_XREF_PERSON (id, xref_sys_id, xref_person_id) VALUES ( :person_id, :xrefSystemId, :xrefPersonId )")
-        Long insert(@Bind("person_id") Long personId, @BindBean Model.Xref in);
 
-        @Transactional
-        @GetGeneratedKeys
-        @SqlUpdate("insert into integ.INTEG_XREF_PERSON (id, xref_sys_id, xref_person_id) VALUES ( :id, :xrefSystemId, :xrefPersonId )")
-        Long insert(@BindBean Model.Xref in);
-
-
-        @Transactional
-        @GetGeneratedKeys
-        @SqlUpdate("insert into integ.INTEG_XREF_PERSON (id, xref_sys_id) VALUES ( :person_id, :xrefSystemId)")
-            // RETURNING id
-        Long recordIntentPersonXref(@Bind("person_id") Long personId, @Bind("subsysId") String xrefSubsysId);
-
-
-        @SqlQuery("SELECT id, xref_sys_id, xref_person_id, ts_create, ts_update,ts_ss_refreshed from integ.INTEG_XREF_PERSON where id = :masterPersonId")
-        @RegisterBeanMapper(MapperXref.class)
-        List<Model.Xref> getXrefPerson(@Bind("masterPersonId") Long masterPersonId);
-
-
-    }
 
     interface person {
         @Deprecated
         @SqlQuery(Queries.sql_person_select_byId)
-        @RegisterBeanMapper(MapperPersonWithAddress.class)
-        Optional<Model.Person> get(@Bind("id") long id);
+//        @RegisterBeanMapper(RowMapperPersonWithAddress.class)
+        @UseRowReducer(ReducerPersonAddressXref.class)
+        @RegisterBeanMapper(value = Model.Person.class, prefix = "p")
+        @RegisterBeanMapper(value = Model.PostalAddress.class, prefix = "a")
+        @RegisterBeanMapper(value = Model.Xref.class, prefix = "x")
+        Optional<Model.Person.Builder> get(@Bind("id") Long id);
 
         @GetGeneratedKeys
         @SqlUpdate("insert into integ.INTEG_PERSON(firstname, lastname, email, phone1, phone2) VALUES ( :firstName, :lastName, :email, :phone1, :phone2 )")
@@ -72,7 +50,11 @@ interface JdbiDao {//extends CRUDDao<Model.Person>
 
         @Deprecated
         @SqlQuery(Queries.sql_person_select_all)
-        List<Model.Person> getAll();
+        @UseRowReducer(ReducerPersonAddressXref.class)
+        @RegisterBeanMapper(value = Model.Person.class, prefix = "p")
+        @RegisterBeanMapper(value = Model.PostalAddress.class, prefix = "a")
+        @RegisterBeanMapper(value = Model.Xref.class, prefix = "x")
+        List<Model.Person.Builder> getAll();
 
         @Deprecated
         @SqlUpdate("delete from integ.INTEG_PERSON")
@@ -80,9 +62,10 @@ interface JdbiDao {//extends CRUDDao<Model.Person>
 
         @Deprecated
         @SqlUpdate("delete from integ.INTEG_PERSON where id = cast(:id as INTEGER )")
-        void delete(@Bind("id") long id);
+        void delete(@Bind("id") Long id);
 
     }
+
 
     interface address {
         @Transactional
@@ -101,7 +84,40 @@ interface JdbiDao {//extends CRUDDao<Model.Person>
 
     }
 
+
+    //    @GetGeneratedKeys
+//    @SqlUpdate("INSERT INTO integ.INTEG_PERSON(firstname, lastname, email, phone1, phone2 VALUES ( :firstName, :lastName, :email, :phone1, :phone2)")
+//    Long insert(@BindBean Model.Person in);
+    interface xref {
+        @Transactional
+        @GetGeneratedKeys
+        @SqlUpdate("insert into integ.INTEG_XREF_PERSON (id, xref_sys_id, xref_person_id) VALUES ( :person_id, :xrefSystemId, :xrefId )")
+        Long insert(@Bind("person_id") Long personId, @BindBean Model.Xref in);
+
+        @Transactional
+        @GetGeneratedKeys
+        @SqlUpdate("insert into integ.INTEG_XREF_PERSON (id, xref_sys_id, xref_person_id) VALUES ( :id, :xrefSystemId, :xrefId )")
+        Long insert(@BindBean Model.Xref in);
+
+
+        @Transactional
+        @GetGeneratedKeys
+        @SqlUpdate("insert into integ.INTEG_XREF_PERSON (id, xref_sys_id) VALUES ( :person_id, :xrefSystemId)")
+            // RETURNING id
+        Long recordIntentPersonXref(@Bind("person_id") Long personId, @Bind("subsysId") String xrefSubsysId);
+
+
+        @SqlQuery("SELECT id, xref_sys_id, xref_person_id, ts_create, ts_update,ts_ss_refreshed from integ.INTEG_XREF_PERSON where id = :masterPersonId")
+        @RegisterBeanMapper(RowMapperXref.class)
+        List<Model.Xref> getXrefPerson(@Bind("masterPersonId") Long masterPersonId);
+
+
+    }
+
     interface acase {
 
     }
+
+
 }//Dao
+

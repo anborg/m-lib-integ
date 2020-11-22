@@ -1,11 +1,13 @@
 package access.integ;
 
 
-import muni.dao.CRUDDao;
 import muni.model.Model;
 import muni.service.SubsystemService;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -49,7 +51,7 @@ class IntegServiceImpl implements IntegService {
         //4. TODO Command-SS to create those accounts - api calls
         //5. TODO Update SS-personId to subbaccounts in INTEG_XREF
         List<Model.Xref> toCreate = in.getXrefAccountsMap().values().stream()
-                .filter(xref -> xref.hasXrefPersonId() == false) // subsystem not called.
+                .filter(xref -> xref.hasXrefId() == false) // subsystem not called.
                 .collect(Collectors.toList());
         for (Model.Xref xref : toCreate) {
             try {// Call Amanda  / Hansen
@@ -59,7 +61,7 @@ class IntegServiceImpl implements IntegService {
                 var xrefWithId = Model.Xref.newBuilder()
                         .setId("" + personMasterId)
                         .setXrefSystemId(xref.getXrefSystemId())//Was a bug here.
-                        .setXrefPersonId(xrefPerson.getId()).build();
+                        .setXrefId(xrefPerson.getId()).build();
                 Long id = integDao.createOrUpdate(xrefWithId);
                 System.out.println("Xref inserted id=" + id);
             } catch (Exception e) {
@@ -79,14 +81,20 @@ class IntegServiceImpl implements IntegService {
         System.out.println("At integServiceImpl pers=" + out);
         return out;
     }
+
     @Override
-    public Optional<Model.Person> getSubsystemPerson(Model.Xref xref){
+    public Optional<Model.Person> getSubsystemPerson(Model.Xref xref) {
         var service = getSubsystemService(xref.getXrefSystemId());
-        var xrefPerson = service.person().get(xref.getXrefPersonId());
+        var xrefPerson = service.person().get(xref.getXrefId());
         return xrefPerson;
     }
 
-    private Model.Person updateSubsystemPerson(Subsys subsys , Model.Person in ){
+    @Override
+    public List<Model.Person> personsRecent() {
+        return integDao.getRecentPersons();
+    }
+
+    private Model.Person updateSubsystemPerson(Subsys subsys, Model.Person in) {
         var subService = getSubsystemService(subsys.toString());
         var xrefPerson = subService.person().update(in);
         return xrefPerson;
@@ -97,8 +105,8 @@ class IntegServiceImpl implements IntegService {
         var persUpdated = integDao.update(in);
 
         for(var xref: in.getXrefAccountsMap().values()){
-            if(xref.hasId() && xref.hasXrefSystemId() && xref.hasXrefPersonId()){
-                var subsystemPerson =IntegUtil.buildSubsystemPerson(xref, in);
+            if (xref.hasId() && xref.hasXrefSystemId() && xref.hasXrefId()) {
+                var subsystemPerson = IntegUtil.buildSubsystemPerson(xref, in);
                 updateSubsystemPerson(Subsys.getValueOf(xref.getXrefSystemId()), subsystemPerson);
             }
         }

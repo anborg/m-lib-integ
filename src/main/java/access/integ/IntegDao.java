@@ -2,6 +2,7 @@ package access.integ;
 
 import muni.model.Model;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface IntegDao {
@@ -11,6 +12,10 @@ public interface IntegDao {
 
     Model.Person update(Model.Person in);
 
+    List<Model.Person> getRecentPersons();
+
+    //Integration with subsystems
+    @Deprecated
     Model.Person recordIntentXref(Model.Person in, Subsys subsysType);
 
     Long createOrUpdate(Model.Xref in);
@@ -20,5 +25,6 @@ public interface IntegDao {
     Model.Case update(Model.Case in);
 
     Model.Case recordIntentXref(Model.Case in, Subsys subsysType);
+
 
 }
