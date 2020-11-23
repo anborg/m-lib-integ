@@ -27,11 +27,7 @@ public class IntegUtil {
         return service;
     }
 
-    // Use for junit
-    @Deprecated
-    public static SubsystemService inMem() {
-        return withDs(inmemDS());
-    }
+
 
     // Use for integ-test
     public static IntegService dev() {
@@ -43,6 +39,13 @@ public class IntegUtil {
         return new IntegServiceImpl(dao);
     }
 
+    /*
+    // Use for junit
+    @Deprecated
+    public static SubsystemService inMem() {
+        return withDs(inmemDS());
+    }
+
     @Deprecated
     private static SubsystemService withDs(DataSource ds) {
         CRUDDao<Model.Person> personDao = JdbiDbUtil.getDao(ds, Model.Person.class);
@@ -50,7 +53,7 @@ public class IntegUtil {
         CRUDDao<Model.PostalAddress> addressDao = JdbiDbUtil.getDao(ds, Model.PostalAddress.class);
         CRUDDao<Model.Case> caseDao = JdbiDbUtil.getDao(ds, Model.Case.class);
         return new IntegSubsystemServiceImpl(personDao, xrefDao, addressDao, caseDao);
-    }
+    }*/
 
     private static String inmemDbUrl_anon_one_connection() {
         String INMEM_DB_URL = "jdbc:h2:mem:;" +

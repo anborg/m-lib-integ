@@ -2,8 +2,8 @@ package integ.dao.jdbi;
 
 import access.integ.IntegDao;
 import access.integ.IntegUtil;
-import muni.dao.CRUDDao;
 import muni.model.Model;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,11 +12,12 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestDaoImpl {
-    IntegDao dao= null;
+public class TestIntegDaoImpl {
+//    static IntegDao dao= null;
+    static IntegDao dao  = new IntegDaoImpl(JdbiDbUtil.withDbPlugin(IntegUtil.inmemDS()));
 
-    @BeforeEach
-    public void setup(){dao = new DaoImpl(JdbiDbUtil.withDbPlugin(IntegUtil.inmemDS())); }
+//    @BeforeEach
+//    public void setup(){dao = new IntegDaoImpl(JdbiDbUtil.withDbPlugin(IntegUtil.inmemDS())); }
 
     @Test
     public void test_jdbi_person_dao() {
@@ -47,7 +48,7 @@ public class TestDaoImpl {
     @Test
     public void get_person_withNoaddress() {
         Optional<Model.Person> opt = dao.get("1");
-        assertThat(opt.isPresent()).isFalse();
+        assertThat(opt.isPresent()).isTrue();
 //        final var p = opt.get();
 //        System.out.println(p.toString());
 //        assertThat(p.hasAddress()).isFalse();

@@ -27,7 +27,7 @@ class IntegServiceImpl implements IntegService {
     @Override
     public void setSubsystemService(Subsys subsys, SubsystemService service) {
         if (serviceMap.containsKey(subsys))
-            throw new RuntimeException("Initialization error: Attempt to add same type of service twice servocetypee=" + subsys);
+            throw new RuntimeException("Initialization error: Attempt to add same type of service twice serviceType=" + subsys);
         serviceMap.put(subsys, service);
     }
     @Override

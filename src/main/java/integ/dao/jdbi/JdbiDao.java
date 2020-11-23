@@ -1,6 +1,8 @@
 package integ.dao.jdbi;
 
 import muni.model.Model;
+import org.jdbi.v3.core.result.LinkedHashMapRowReducer;
+import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
@@ -11,17 +13,15 @@ import org.jdbi.v3.sqlobject.statement.UseRowReducer;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 //@RegisterBeanMapper(RowMapperPersonWithAddress.class) //DO NOT ADD mapper at class level. Add at method level //TODO make note.
 interface JdbiDao {//extends CRUDDao<Model.Person>
-
-
-
     interface person {
         @Deprecated
         @SqlQuery(Queries.sql_person_select_byId)
-//        @RegisterBeanMapper(RowMapperPersonWithAddress.class)
         @UseRowReducer(ReducerPersonAddressXref.class)
         @RegisterBeanMapper(value = Model.Person.class, prefix = "p")
         @RegisterBeanMapper(value = Model.PostalAddress.class, prefix = "a")
@@ -118,6 +118,28 @@ interface JdbiDao {//extends CRUDDao<Model.Person>
 
     }
 
+    class ReducerPersonAddressXref implements LinkedHashMapRowReducer<Long, Model.Person.Builder> {
 
-}//Dao
+        @Override
+        public void accumulate(Map<Long, Model.Person.Builder> map, RowView rowView) {
+            Model.Person.Builder p = map.computeIfAbsent(rowView.getColumn("p_id", Long.class),
+                    id -> rowView.getRow(Model.Person.Builder.class));
+
+            //Address for Person.
+            if (!p.hasAddress() && rowView.getColumn("a_id", Long.class) != null) {
+                Model.PostalAddress.Builder addr = rowView.getRow(Model.PostalAddress.Builder.class);
+                p.setAddress(addr);
+            }
+
+            //XREF for Person
+            String sysId = rowView.getColumn("x_xref_sys_id", String.class);
+            if (Objects.nonNull(sysId) && Objects.isNull(p.getXrefAccountsMap().get(sysId)) ) {
+                Model.Xref.Builder xref = rowView.getRow(Model.Xref.Builder.class);
+                p.putXrefAccounts(xref.getXrefSystemId(), xref.build());
+            }
+        }
+    }//ReducerPersonAddressXref
+
+}//JdbiDao
+
 

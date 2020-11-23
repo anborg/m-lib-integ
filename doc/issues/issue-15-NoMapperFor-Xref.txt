@@ -39,7 +39,7 @@ org.jdbi.v3.core.mapper.NoSuchMapperException: No mapper registered for type mun
 	at org.jdbi.v3.core.Jdbi.callWithExtension(Jdbi.java:475)
 	at org.jdbi.v3.core.Jdbi.withExtension(Jdbi.java:462)
 	at integ.dao.jdbi.DaoImplPerson.get(DaoImplPerson.java:34)
-	at integ.dao.jdbi.TestDaoImpl.test_jdbi_person_dao(TestDaoImpl.java:25)
+	at integ.dao.jdbi.TestIntegDaoImpl.test_jdbi_person_dao(TestDaoImpl.java:25)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)

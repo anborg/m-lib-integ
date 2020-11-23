@@ -11,10 +11,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class DaoImpl implements IntegDao {
+class IntegDaoImpl implements IntegDao {
     Jdbi jdbi;
 
-    public DaoImpl(Jdbi jdbi) {
+    public IntegDaoImpl(Jdbi jdbi) {
         this.jdbi = jdbi;
     }
 

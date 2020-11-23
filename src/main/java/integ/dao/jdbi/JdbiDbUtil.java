@@ -1,8 +1,6 @@
 package integ.dao.jdbi;
 
 import access.integ.IntegDao;
-import muni.dao.CRUDDao;
-import muni.model.Model;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.h2.H2DatabasePlugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
@@ -53,10 +51,10 @@ public class JdbiDbUtil {
 
     public static IntegDao getIntegDao(DataSource ds) {
         //if (!type.isInterface()) throw new RuntimeException("Only interface type expected");
-        return new DaoImpl(withDbPlugin(ds));
+        return new IntegDaoImpl(withDbPlugin(ds));
     }
 
-    @Deprecated
+    /*@Deprecated
     public static <T> CRUDDao<T> getDao(DataSource ds, Class<T> type) {
         //if (!type.isInterface()) throw new RuntimeException("Only interface type expected");
 
@@ -75,6 +73,6 @@ public class JdbiDbUtil {
         }
 
         throw new UnsupportedOperationException("Interface not expected" + type.getName());
-    }
+    }*/
 
 }

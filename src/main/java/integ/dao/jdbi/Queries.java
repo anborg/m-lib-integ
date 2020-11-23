@@ -1,6 +1,6 @@
 package integ.dao.jdbi;
 
-public interface Queries {
+interface Queries {
     String sql_person_select_all = "select\n" +
             "    p.id p_id,\n" +
             "    p.firstname p_firstname,\n" +

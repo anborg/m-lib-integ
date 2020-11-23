@@ -12,8 +12,6 @@ import java.util.Optional;
 
 //mapper -- THe order of building may need to follow this standard pattern.
 class RowMapperAddress implements RowMapper<Model.PostalAddress.Builder> {
-    public RowMapperAddress() {
-    }
 
     @Override
     public Model.PostalAddress.Builder map(ResultSet rs, StatementContext ctx) throws SQLException {
