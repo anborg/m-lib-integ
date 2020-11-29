@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class IntegDaoImpl implements IntegDao {
     Jdbi jdbi;
@@ -19,9 +20,12 @@ class IntegDaoImpl implements IntegDao {
     }
 
     /**
-     * Save Person.fn ln, addr, [DO NOT SAVE XREF_IDs]
+     * NEW-Person, No-id,
+     *  - if Address present, insert => addr_id
+     *  - insert person core fields fn ln,email,phone, addr_id => pers_id
+     *  - DO NOT call Subsystem.person.create(pers_id, xref) -- will be handled in ServiceLayer, Reason: If a subsystem is unavailable, subsys-Error must be ignored just for that subsystem.
      * @param in person
-     * @return id
+     * @return peronId
      */
     @Override
     public Long create(Model.Person in) {
@@ -40,7 +44,7 @@ class IntegDaoImpl implements IntegDao {
         }
 
         //3. Save intentions on SS-accounts in INTEG_XREF
-        //forPersonInsertOrUpdateXref(personId, in);
+        //forPersonInsertOrUpdateXref(personId, in); //XREF are inserted in integService,
         return personId;
 //        var opt= get(""+personId);
 //        var pCreated = opt.isPresent()? opt.get() : null;
@@ -85,6 +89,7 @@ class IntegDaoImpl implements IntegDao {
         } else {
             throw new UnsupportedOperationException("NO DML, why is control coming here? Hint: Did you forget to set mandatory fields for Person obj? =" + in + "\n====================================");
         }
+        //forPersonInsertOrUpdateXref(personId, in);
         var opt = get("" + personId);
         return opt.isPresent() ? opt.get() : null;
     }
@@ -101,8 +106,12 @@ class IntegDaoImpl implements IntegDao {
     }
 
     @Override
-    public Long createOrUpdate(Model.Xref in) {
-        return jdbi.withExtension(JdbiDao.xref.class, dao -> dao.insert(in));
+    public Long create(Model.Xref in) {
+        if (in.hasId() && in.hasXrefSystemId()){
+            return jdbi.withExtension(JdbiDao.xref.class, dao -> dao.insert(in));
+        }else{
+            throw new RuntimeException("Invalid Xref to save, must have master_id & subsystem_id");
+        }
     }
 
     // ---- Case  ---
@@ -123,11 +132,24 @@ class IntegDaoImpl implements IntegDao {
 
 
     // ---- Helper functions ---
-    //update xref in Person object
-    private void forPersonInsertOrUpdateXref(final Long personId, Model.Person in) {
-        in.getXrefAccountsMap().values().forEach(xref -> {
-            jdbi.withExtension(JdbiDao.xref.class, dao -> dao.insert(personId, xref));
-        });
+    //update xref in Person object //Note: PersonXref are inserted in IntegServiceImpl, and deactivated in other mechanism
+    // NO UPDATE for XREF_PERSON !
+    /*
+    private void forPersonInsertOrUpdateXref(final Long masterPersonId, Model.Person in) {
+        Stream<Model.Xref> insertable = in.getXrefAccountsMap().values().stream().filter(x -> isInsertable(x));
+        Stream<Model.Xref> updatable = in.getXrefAccountsMap().values().stream().filter(x -> !isInsertable(x));
+
+        insertable.forEach(xref -> jdbi.withExtension(JdbiDao.xref.class, dao -> dao.insert(masterPersonId, xref)));
+        updatable.forEach(xref -> jdbi.withExtension(JdbiDao.xref.class, dao -> dao.update(masterPersonId, xref)));
+
+    }*/
+    private static boolean isInsertable(Model.Xref in){
+        if(in.hasXrefId()) {
+            return false; // not insertable
+        }else{
+            return true; // no xrefId filled, so new link to subsystem, so insert.
+        }
+
     }
 
 

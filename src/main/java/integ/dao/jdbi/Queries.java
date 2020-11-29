@@ -31,12 +31,12 @@ interface Queries {
             "    xp.ts_refreshed x_ts_refreshed\n" +
 
             "from\n" +
-            "    integ.INTEG_PERSON p\n" +
-            "    left join integ.integ_ADDRESS addr on p.address_id = addr.id\n" +
-            "    left join integ.integ_XREF_PERSON xp on p.id = xp.id\n" ;
+            "    INTEG_PERSON p\n" +
+            "    left join INTEG_ADDRESS addr on p.address_id = addr.id\n" +
+            "    left join INTEG_XREF_PERSON xp on p.id = xp.id\n" ;
     String sql_person_select_byId = sql_person_select_all+
             "where\n" +
-            "    p.id = :id";
+            "    p.id = cast( :id as INTEGER )";
 
     String sql_address_insert = "";
 }

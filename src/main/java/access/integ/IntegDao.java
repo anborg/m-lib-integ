@@ -18,7 +18,7 @@ public interface IntegDao {
     @Deprecated
     Model.Person recordIntentXref(Model.Person in, Subsys subsysType);
 
-    Long createOrUpdate(Model.Xref in);
+    Long create(Model.Xref in);
 
     Model.Case create(Model.Case in);
 

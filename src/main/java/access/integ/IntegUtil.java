@@ -5,7 +5,6 @@ import access.hansen.HansenUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import integ.dao.jdbi.JdbiDbUtil;
-import muni.dao.CRUDDao;
 import muni.model.Model;
 import muni.service.SubsystemService;
 import org.postgresql.ds.PGSimpleDataSource;
@@ -16,46 +15,38 @@ import java.util.Properties;
 import java.util.Random;
 
 public class IntegUtil {
-    public static IntegService mock() {
-        IntegService service = withDs2(inmemDS());
+    /**
+     * Build IntegService for a supplied datasource.
+     *
+     * @return
+     */
+    public static IntegService forDS(DataSource datasource) {
+        IntegDao dao = JdbiDbUtil.getIntegDao(datasource);
+        IntegService service = new IntegServiceImpl(dao);
+        setSubsystem(service);
+        return service;
+    }
+
+    private static void setSubsystem(IntegService service){
         SubsystemService amandaService = AmandaUtil.mock();
         SubsystemService hansenService = HansenUtil.mock();
         //TODO Be careful not to mix
         service.setSubsystemService(Subsys.AMANDA, amandaService);
         service.setSubsystemService(Subsys.HANSEN, hansenService);
-
-        return service;
     }
 
 
+    /**
+     * Build IntegService with a mock db, for testing
+     * @return
+     */
+    public static IntegService mock() {return forDS(inmemDS());}
 
-    // Use for integ-test
-    public static IntegService dev() {
-        return withDs2(devDS());
-    }
+    public static IntegService postgres() {return forDS(pgDS());}
 
-    private static IntegService withDs2(DataSource ds) {
-        IntegDao dao = JdbiDbUtil.getIntegDao(ds);
-        return new IntegServiceImpl(dao);
-    }
+    public static IntegService oracle() {return forDS(oracleDS()); }
 
-    /*
-    // Use for junit
-    @Deprecated
-    public static SubsystemService inMem() {
-        return withDs(inmemDS());
-    }
-
-    @Deprecated
-    private static SubsystemService withDs(DataSource ds) {
-        CRUDDao<Model.Person> personDao = JdbiDbUtil.getDao(ds, Model.Person.class);
-        CRUDDao<Model.Xref> xrefDao = JdbiDbUtil.getDao(ds, Model.Xref.class);
-        CRUDDao<Model.PostalAddress> addressDao = JdbiDbUtil.getDao(ds, Model.PostalAddress.class);
-        CRUDDao<Model.Case> caseDao = JdbiDbUtil.getDao(ds, Model.Case.class);
-        return new IntegSubsystemServiceImpl(personDao, xrefDao, addressDao, caseDao);
-    }*/
-
-    private static String inmemDbUrl_anon_one_connection() {
+    private static String datasourceH2() {
         String INMEM_DB_URL = "jdbc:h2:mem:;" +
                 "INIT=RUNSCRIPT FROM 'classpath:integ/schema.sql'\\;" +
                 "RUNSCRIPT FROM 'classpath:integ/data.sql'";
@@ -64,12 +55,53 @@ public class IntegUtil {
 
     final static Random random = new Random();
 
-    private static DataSource devDS() {
+
+    /**
+     * Build a pg ds from
+     * @return
+     */
+    private static DataSource oracleDS() {
+        final Properties props = new Properties();
+        final HikariDataSource ds = new HikariDataSource();
+        final String CONFIG_FILE = "ds-oracle.properties";
+        String jdbcURL= null;
+        try (final InputStream stream =
+                     new Dummy().getClass().getClassLoader().getResourceAsStream(CONFIG_FILE)) {
+            props.load(stream);
+            String host = props.getProperty("db.host");
+            Integer port = Integer.valueOf(props.getProperty("db.port"));
+            String sid = props.getProperty("db.sid");
+            String user = props.getProperty("db.user");
+            String pwd = props.getProperty("db.password");
+            Integer poolSize = Integer.valueOf(props.getProperty("db.poolsize"));
+            //
+            ds.setMaximumPoolSize(2);
+            ds.setDriverClassName("oracle.jdbc.driver.OracleDriver");
+             jdbcURL = "jdbc:oracle:thin:@"+host+":"+port+"/"+ sid;
+            ds.setJdbcUrl(jdbcURL); ;
+            ds.setUsername(user);
+            ds.setPassword(pwd);
+            ds.setMaximumPoolSize(poolSize);
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating Oracle DS for url="+ jdbcURL+",  from file: " + CONFIG_FILE , e);
+        }
+        HikariConfig hc = new HikariConfig();
+        hc.setDataSource(ds);
+        HikariDataSource hdc = new HikariDataSource(hc);
+        return hdc;
+    }
+    /**
+     * Build a pg ds from
+     * @return
+     */
+    private static DataSource pgDS() {
         final Properties props = new Properties();
         PGSimpleDataSource ds = null;
+        final String CONFIG_FILE="ds-postgres.properties";
         try (final InputStream stream =
-                     new Dummy().getClass().getClassLoader().getResourceAsStream("db-dev.properties")) {
+                     new Dummy().getClass().getClassLoader().getResourceAsStream(CONFIG_FILE)) {
             props.load(stream);
+
             ds = new PGSimpleDataSource();
             String host = props.getProperty("db.dev.host");
             String port = props.getProperty("db.dev.port");
@@ -84,7 +116,7 @@ public class IntegUtil {
             ds.setUser(user);
             ds.setPassword(pwd);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error creating Oracle DS from file: " + CONFIG_FILE);
         }
         HikariConfig hc = new HikariConfig();
         hc.setDataSource(ds);
@@ -93,11 +125,16 @@ public class IntegUtil {
         return hdc;
     }
 
+
+    /**
+     * Build an inmem ds
+     * @return
+     */
     public static DataSource inmemDS() {
         final Properties props = new Properties();
         org.h2.jdbcx.JdbcDataSource ds ;
         ds = new org.h2.jdbcx.JdbcDataSource();
-        ds.setURL(inmemDbUrl_anon_one_connection());
+        ds.setURL(datasourceH2());
         ds.setUser("sa");
         ds.setPassword("");
         HikariConfig hc = new HikariConfig();
@@ -123,3 +160,20 @@ public class IntegUtil {
     }
 
 }
+
+
+    /*
+    // Use for junit
+    @Deprecated
+    public static SubsystemService inMem() {
+        return withDs(inmemDS());
+    }
+
+    @Deprecated
+    private static SubsystemService withDs(DataSource ds) {
+        CRUDDao<Model.Person> personDao = JdbiDbUtil.getDao(ds, Model.Person.class);
+        CRUDDao<Model.Xref> xrefDao = JdbiDbUtil.getDao(ds, Model.Xref.class);
+        CRUDDao<Model.PostalAddress> addressDao = JdbiDbUtil.getDao(ds, Model.PostalAddress.class);
+        CRUDDao<Model.Case> caseDao = JdbiDbUtil.getDao(ds, Model.Case.class);
+        return new IntegSubsystemServiceImpl(personDao, xrefDao, addressDao, caseDao);
+    }*/

@@ -62,7 +62,7 @@ class IntegServiceImpl implements IntegService {
                         .setId("" + personMasterId)
                         .setXrefSystemId(xref.getXrefSystemId())//Was a bug here.
                         .setXrefId(xrefPerson.getId()).build();
-                Long id = integDao.createOrUpdate(xrefWithId);
+                Long id = integDao.create(xrefWithId);
                 System.out.println("Xref inserted id=" + id);
             } catch (Exception e) {
                 //TODO if call to subsystem fails, just ignore, as a backend thread may handle it.
@@ -117,7 +117,7 @@ class IntegServiceImpl implements IntegService {
 
 
     void recordXref(Model.Xref in) {
-        integDao.createOrUpdate(in);
+        integDao.create(in);
     }
 
     @Override
