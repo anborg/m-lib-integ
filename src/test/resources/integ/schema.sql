@@ -58,10 +58,10 @@ insert into INTEG_PERSON (id, firstname, lastname, email, phone1, phone2, addres
 ;
 
 insert into INTEG_XREF_PERSON (id, xref_sys_id, xref_person_id) values
-( 1,'AMANDA', null)
-,( 2,'HANSEN', null)
-,( 3,'AMANDA', null)
-,( 3,'HANSEN', null)
+( 1,'AMANDA', 1001)
+,( 1,'HANSEN', 1001)
+,( 2,'AMANDA', 2001)
+,( 3,'HANSEN', 3001)
 ;
 
 
