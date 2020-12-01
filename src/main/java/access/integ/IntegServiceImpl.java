@@ -102,6 +102,7 @@ class IntegServiceImpl implements IntegService {
 
     @Override
     public Model.Person update(Model.Person in) {
+        System.out.println("at integsvcImpl update id="+ in.getId());
         var persUpdated = integDao.update(in);
 
         for(var xref: in.getXrefAccountsMap().values()){

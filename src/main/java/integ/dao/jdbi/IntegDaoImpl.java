@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 class IntegDaoImpl implements IntegDao {
     Jdbi jdbi;
@@ -53,6 +52,7 @@ class IntegDaoImpl implements IntegDao {
 
     @Override
     public Optional<Model.Person> get(String id) {
+        System.out.println("Dao get person for id="+ id);
         Long idLong = Long.valueOf(id);
         var optPerson = jdbi.withExtension(JdbiDao.person.class, dao -> dao.get(idLong));
         return optPerson.map(b-> b.build());
@@ -78,7 +78,7 @@ class IntegDaoImpl implements IntegDao {
         //check address
         Long addrId = forPersonInsertOrUpdateAddress(in);//TODO watch : may add 'duplicate' address
         boolean isValidForUpdate = DataQuality.Person.isValidForUpdate(in);
-        Long personId;
+        Long personId = null;
 
         if (isValidForUpdate) {//update
             if (Objects.nonNull(addrId)) {
@@ -90,8 +90,10 @@ class IntegDaoImpl implements IntegDao {
             throw new UnsupportedOperationException("NO DML, why is control coming here? Hint: Did you forget to set mandatory fields for Person obj? =" + in + "\n====================================");
         }
         //forPersonInsertOrUpdateXref(personId, in);
-        var opt = get("" + personId);
+        System.out.println("At integdaoimpl pid="+in.getId());
+        var opt = get(in.getId());
         return opt.isPresent() ? opt.get() : null;
+
     }
 
     //At Service layer Call syubsys.create(Person), take the id, create an Xref object
