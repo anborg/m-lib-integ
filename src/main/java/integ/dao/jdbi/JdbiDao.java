@@ -145,9 +145,9 @@ interface JdbiDao {//extends CRUDDao<Model.Person>
 
             //XREF for Person
             String sysId = rowView.getColumn("x_xref_sys_id", String.class);
-            if (Objects.nonNull(sysId) && Objects.isNull(p.getXrefAccountsMap().get(sysId)) ) {
+            if (Objects.nonNull(sysId) && Objects.isNull(p.getXrefsMap().get(sysId)) ) {
                 Model.Xref.Builder xref = rowView.getRow(Model.Xref.Builder.class);
-                p.putXrefAccounts(xref.getXrefSystemId(), xref.build());
+                p.putXrefs(xref.getXrefSystemId(), xref.build());
             }
         }
     }//ReducerPersonAddressXref

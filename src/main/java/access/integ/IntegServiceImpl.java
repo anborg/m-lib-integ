@@ -50,7 +50,7 @@ class IntegServiceImpl implements IntegService {
 
         //4. TODO Command-SS to create those accounts - api calls
         //5. TODO Update SS-personId to subbaccounts in INTEG_XREF
-        List<Model.Xref> toCreate = in.getXrefAccountsMap().values().stream()
+        List<Model.Xref> toCreate = in.getXrefsMap().values().stream()
                 .filter(xref -> xref.hasXrefId() == false) // subsystem not called.
                 .collect(Collectors.toList());
         for (Model.Xref xref : toCreate) {
@@ -105,7 +105,7 @@ class IntegServiceImpl implements IntegService {
         System.out.println("at integsvcImpl update id="+ in.getId());
         var persUpdated = integDao.update(in);
 
-        for(var xref: in.getXrefAccountsMap().values()){
+        for(var xref: in.getXrefsMap().values()){
             if (xref.hasId() && xref.hasXrefSystemId() && xref.hasXrefId()) {
                 var subsystemPerson = IntegUtil.buildSubsystemPerson(xref, in);
                 updateSubsystemPerson(Subsys.getValueOf(xref.getXrefSystemId()), subsystemPerson);

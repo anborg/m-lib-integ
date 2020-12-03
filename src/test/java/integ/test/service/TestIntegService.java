@@ -53,8 +53,8 @@ public class TestIntegService {
         Model.Person c1_new = Model.Person.newBuilder()
                 .setFirstName("Bob").setLastName("Fork")
                 .setEmail("bob@gmail.com")
-                .putXrefAccounts(amdXref.getXrefSystemId(), amdXref)
-                .putXrefAccounts(hansenXref.getXrefSystemId(), hansenXref)
+                .putXrefs(amdXref.getXrefSystemId(), amdXref)
+                .putXrefs(hansenXref.getXrefSystemId(), hansenXref)
                 .build();
         //valid?
         assertThat(DataQuality.Person.isValidForInsert(c1_new)).isTrue();
@@ -65,7 +65,7 @@ public class TestIntegService {
         assertThat(c1_fromdb).extracting(Model.Person::getFirstName, Model.Person::getLastName, Model.Person::getEmail)
                 .containsExactly(c1_new.getFirstName(), c1_new.getLastName(), c1_new.getEmail());
         //check xref
-        var amdXref_fromdb = c1_fromdb.getXrefAccountsMap().get(amdXref.getXrefSystemId());
+        var amdXref_fromdb = c1_fromdb.getXrefsMap().get(amdXref.getXrefSystemId());
         assertThat(amdXref_fromdb).isNotNull();
         assertThat(amdXref_fromdb).extracting(Model.Xref::getXrefSystemId, Model.Xref::getId, Model.Xref::getXrefId)
                 .containsExactly(amdXref.getXrefSystemId(), c1_fromdb.getId(), amdXref_fromdb.getXrefId());
@@ -87,7 +87,7 @@ public class TestIntegService {
         assertThat(integPerson_fromdb).extracting(Model.Person::getLastName).containsExactly(updatedLastName);
 
         //verify lastname propagated to all subsystems
-        for (var xref : integPerson_fromdb.getXrefAccountsMap().values()) {
+        for (var xref : integPerson_fromdb.getXrefsMap().values()) {
             var xrefPerson = service.getSubsystemPerson(xref).get();
             assertThat(xrefPerson).as("Verify Person updates in xref system=" + xref.getXrefSystemId())
                     .extracting(Model.Person::getId, Model.Person::getLastName)

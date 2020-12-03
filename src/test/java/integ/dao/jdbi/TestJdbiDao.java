@@ -35,7 +35,7 @@ public class TestJdbiDao {
                 .setPhone2("12345678")//To PERSON table
                 //To ADDRES table
                 .setAddress(pi_addr)
-                .putXrefAccounts(p1_xref_amanda.getXrefSystemId(), p1_xref_amanda)
+                .putXrefs(p1_xref_amanda.getXrefSystemId(), p1_xref_amanda)
                 .build();
         final var p2 = Model.Person.newBuilder().setFirstName("Clarice").setLastName("Stuck").setEmail("claricee@gmail.com").build();
         final var p3 = Model.Person.newBuilder().setFirstName("Delete").setLastName("Me").setEmail("me@gmail.com").build();
