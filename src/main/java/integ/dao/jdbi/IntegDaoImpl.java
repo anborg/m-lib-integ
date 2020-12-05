@@ -56,16 +56,6 @@ class IntegDaoImpl implements IntegDao {
         Long idLong = Long.valueOf(id);
         var optPerson = jdbi.withExtension(JdbiDao.person.class, dao -> dao.get(idLong));
         return optPerson.map(b-> b.build());
-//        List<Model.Xref> xref = List.of();
-//        if (optPerson.isPresent()) xref = jdbi.withExtension(JdbiDao.xref.class, dao -> dao.getXrefPerson(idLong));
-//
-//        if (xref.isEmpty()) {
-//            return optPerson.map(b -> b.build());
-//        } else {
-//            var pBuilder = optPerson.get();
-//            xref.forEach(x -> pBuilder.putXrefAccounts(x.getXrefSystemId(), x));//No separate Xref, use LEFTJOIN
-//            //return Optional.of(pBuilder.build()); //Made to fail.
-//        }
     }
 
     public List<Model.Person> getRecentPersons() {
@@ -118,13 +108,58 @@ class IntegDaoImpl implements IntegDao {
 
     // ---- Case  ---
     @Override
-    public Model.Case create(Model.Case in) {
-        return null;
+    public Optional<Model.Case> getCase(String id) {
+        System.out.println("Dao get case for id="+ id);
+        Long idLong = Long.valueOf(id);
+        var optPerson = jdbi.withExtension(JdbiDao.acase.class, dao -> dao.get(idLong));
+        return optPerson.map(b-> b.build());
+    }
+    public List<Model.Case> getRecentCases() {
+        return jdbi.withExtension(JdbiDao.acase.class, dao -> dao.getAll()).stream().map(b -> b.build()).collect(Collectors.toList());
+    }
+    @Override
+    public Long create(Model.Case in) {
+        boolean isValidForInsert = DataQuality.Case.isValidForInsert(in);
+        if (!isValidForInsert)
+            throw new UnsupportedOperationException("NOT valid for insert, why is control coming here? Hint: Did you forget to set mandatory fields for Person obj? =" + in + "\n================================");
+        //1. Save the address.
+        Long addrId = null;//forPersonInsertOrUpdateAddress(in);
+
+        //2. Save person details - FN, LN, email
+        Long id ;
+        if (Objects.nonNull(addrId)) { // addr inserted
+            //id = jdbi.withExtension(JdbiDao.acase.class, dao -> dao.insert(in, addrId));
+            throw new UnsupportedOperationException("Address insert not supported");
+        } else {
+            id = jdbi.withExtension(JdbiDao.acase.class, dao -> dao.insert(in));
+        }
+
+        //3. Save intentions on SS-accounts in INTEG_XREF
+        //forPersonInsertOrUpdateXref(personId, in); //XREF are inserted in integService,
+        return id;
+
     }
 
     @Override
     public Model.Case update(Model.Case in) {
-        return null;
+        //check address
+        Long addrId = null;//forPersonInsertOrUpdateAddress(in);//TODO watch : may add 'duplicate' address
+        boolean isValidForUpdate = DataQuality.Case.isValidForUpdate(in);
+        Long id = null;
+
+        if (isValidForUpdate) {//update
+            if (Objects.nonNull(addrId)) {
+                //id = jdbi.withExtension(JdbiDao.acase.class, dao -> dao.update(in, addrId));
+            } else {
+                id = jdbi.withExtension(JdbiDao.acase.class, dao -> dao.update(in));
+            }
+        } else {
+            throw new UnsupportedOperationException("NO DML, why is control coming here? Hint: Did you forget to set mandatory fields for Person obj? =" + in + "\n====================================");
+        }
+        //forPersonInsertOrUpdateXref(personId, in);
+        System.out.println("At integdaoimpl case="+in.getId());
+        var opt = getCase(in.getId());
+        return opt.isPresent() ? opt.get() : null;
     }
 
     @Override

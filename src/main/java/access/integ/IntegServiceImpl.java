@@ -156,6 +156,18 @@ class IntegServiceImpl implements IntegService {
 
 
     @Override
+    public Optional<Model.Case> getCase(String id) {
+        System.out.println("At integServiceImpl case id=" + id);
+        Optional<Model.Case> out = integDao.getCase(id);//Long.valueOf
+        System.out.println("At integServiceImpl case=" + out);
+        return out;
+    }
+    @Override
+    public List<Model.Case> casesRecent() {
+        return integDao.getRecentCases();
+    }
+
+    @Override
     public Model.Case create(Model.Case in) {
         //Person  - create: save Person name/address
         return null;
@@ -163,8 +175,23 @@ class IntegServiceImpl implements IntegService {
 
     @Override
     public Model.Case update(Model.Case in) {
-        //Person  - create: save Person name/address
-        return null;
+        System.out.println("at integsvcImpl update id="+ in.getId());
+        var caseUpdated = integDao.update(in);
+
+        for(var xref: in.getXrefsMap().values()){
+            if (xref.hasId() && xref.hasXrefSystemId() && xref.hasXrefId()) {
+                var subsystemPerson = IntegUtil.buildSubsystemCase(xref, in);
+                updateSubsystemCase(Subsys.getValueOf(xref.getXrefSystemId()), subsystemPerson);
+            }
+        }
+
+        return caseUpdated;//Once saved, assumed "guaranteed" return
+   }
+
+    private Model.Case updateSubsystemCase(Subsys subsys, Model.Case in) {
+        var subService = getSubsystemService(subsys.toString());
+        var xrefCase = subService.ccase().update(in);
+        return xrefCase;
     }
 
     @Override

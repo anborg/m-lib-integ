@@ -17,6 +17,7 @@ public class JdbiDbUtil {
                 .registerRowMapper(new RowMapperPerson())
                 .registerRowMapper(new RowMapperAddress())
                 .registerRowMapper(new RowMapperXref())
+                .registerRowMapper(new RowMapperCase())
         ;
     }
 

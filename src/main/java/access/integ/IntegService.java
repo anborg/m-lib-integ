@@ -21,9 +21,15 @@ public interface IntegService {
 
     Model.Person recordIntentXref(Model.Person in, Subsys subsysType);
 
+
+
+
+
+    Optional<Model.Case> getCase(String id);
     Model.Case create(Model.Case in);
 
     Model.Case update(Model.Case in);
+    List<Model.Case> casesRecent();
 
     Model.Case recordIntentXref(Model.Case in, Subsys subsysType);
 

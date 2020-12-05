@@ -156,6 +156,18 @@ public class IntegUtil {
                 .build();
     }
 
+    public static Model.Case buildSubsystemCase(Model.Xref xref, Model.Case ofCase) {
+        return Model.Case.newBuilder()
+                .setId(xref.getXrefId()) //TODO incomplete - set typeProps,
+                .setTypeId(ofCase.getTypeId())
+                .setDescription(ofCase.getDescription())
+                .setReportedByCustomer(ofCase.getReportedByCustomer())
+                .setCreatedByEmployee(ofCase.getCreatedByEmployee())
+                .setAddress(ofCase.getAddress())
+                .setStatus(ofCase.getStatus())
+                //.putXrefAccounts()//No xref
+                .build();
+    }
     private static class Dummy {/*for prop file load*/
     }
 

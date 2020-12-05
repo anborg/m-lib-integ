@@ -20,8 +20,9 @@ public interface IntegDao {
 
     Long create(Model.Xref in);
 
-    Model.Case create(Model.Case in);
-
+    Long create(Model.Case in);
+    Optional<Model.Case> getCase(String id);
+    List<Model.Case> getRecentCases();
     Model.Case update(Model.Case in);
 
     Model.Case recordIntentXref(Model.Case in, Subsys subsysType);

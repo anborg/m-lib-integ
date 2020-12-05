@@ -7,6 +7,7 @@ import org.jdbi.v3.core.result.RowView;
 import java.util.Map;
 import java.util.Objects;
 // Creating protobuf-java objects from resultset.
+@Deprecated
 class ReducerPersonAddressXref1 implements LinkedHashMapRowReducer<Long, Model.Person.Builder> {
 
         @Override
