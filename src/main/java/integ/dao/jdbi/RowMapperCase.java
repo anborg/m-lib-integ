@@ -14,7 +14,7 @@ class RowMapperCase implements RowMapper<Model.Case.Builder> {
     @Override
     public Model.Case.Builder map(ResultSet rs, StatementContext ctx) throws SQLException {
         Model.Case.Builder pb = Model.Case.newBuilder();
-        String id = "" + rs.getLong("c_id");
+        Long id = rs.getLong("c_id");
         System.out.println("Retrieved case id : " + id);
         if (null == id) return null;//TODO make not of this nul return.
         //build person

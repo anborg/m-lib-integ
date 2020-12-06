@@ -4,6 +4,7 @@ import access.integ.IntegDao;
 import access.integ.Subsys;
 import muni.model.Model;
 import muni.util.DataQuality;
+import muni.util.ProtoUtil;
 import org.jdbi.v3.core.Jdbi;
 
 import java.util.List;
@@ -18,11 +19,30 @@ class IntegDaoImpl implements IntegDao {
         this.jdbi = jdbi;
     }
 
+    // ---- Helper functions ---
+    //update xref in Person object //Note: PersonXref are inserted in IntegServiceImpl, and deactivated in other mechanism
+    // NO UPDATE for XREF_PERSON !
+    /*
+    private void forPersonInsertOrUpdateXref(final Long masterPersonId, Model.Person in) {
+        Stream<Model.Xref> insertable = in.getXrefAccountsMap().values().stream().filter(x -> isInsertable(x));
+        Stream<Model.Xref> updatable = in.getXrefAccountsMap().values().stream().filter(x -> !isInsertable(x));
+
+        insertable.forEach(xref -> jdbi.withExtension(JdbiDaoPerson.xref.class, dao -> dao.insert(masterPersonId, xref)));
+        updatable.forEach(xref -> jdbi.withExtension(JdbiDaoPerson.xref.class, dao -> dao.update(masterPersonId, xref)));
+
+    }*/
+    private static boolean isInsertable(Model.Xref in) {
+        // no xrefId filled, so new link to subsystem, so insert.
+        return !in.hasXrefId(); // not insertable
+
+    }
+
     /**
      * NEW-Person, No-id,
-     *  - if Address present, insert => addr_id
-     *  - insert person core fields fn ln,email,phone, addr_id => pers_id
-     *  - DO NOT call Subsystem.person.create(pers_id, xref) -- will be handled in ServiceLayer, Reason: If a subsystem is unavailable, subsys-Error must be ignored just for that subsystem.
+     * - if Address present, insert => addr_id
+     * - insert person core fields fn ln,email,phone, addr_id => pers_id
+     * - DO NOT call Subsystem.person.create(pers_id, xref) -- will be handled in ServiceLayer, Reason: If a subsystem is unavailable, subsys-Error must be ignored just for that subsystem.
+     *
      * @param in person
      * @return peronId
      */
@@ -37,9 +57,9 @@ class IntegDaoImpl implements IntegDao {
         //2. Save person details - FN, LN, email
         Long personId ;
         if (Objects.nonNull(addrId)) { // addr inserted
-            personId = jdbi.withExtension(JdbiDao.person.class, dao -> dao.insert(in, addrId));
+            personId = jdbi.withExtension(JdbiDaoPerson.class, dao -> dao.insert(in, addrId));
         } else {
-            personId = jdbi.withExtension(JdbiDao.person.class, dao -> dao.insert(in));
+            personId = jdbi.withExtension(JdbiDaoPerson.class, dao -> dao.insert(in));
         }
 
         //3. Save intentions on SS-accounts in INTEG_XREF
@@ -51,17 +71,16 @@ class IntegDaoImpl implements IntegDao {
     }
 
     @Override
-    public Optional<Model.Person> get(String id) {
-        System.out.println("Dao get person for id="+ id);
-        Long idLong = Long.valueOf(id);
-        var optPerson = jdbi.withExtension(JdbiDao.person.class, dao -> dao.get(idLong));
-        return optPerson.map(b-> b.build());
+    public Optional<Model.Person> get(Long id) {
+        System.out.println("Dao get person for id=" + id);
+//        Long idLong = Long.valueOf(id);
+        var optPerson = jdbi.withExtension(JdbiDaoPerson.class, dao -> dao.get(id));
+        return optPerson.map(b -> b.build());
     }
 
     public List<Model.Person> getRecentPersons() {
-        return jdbi.withExtension(JdbiDao.person.class, dao -> dao.getAll()).stream().map(b -> b.build()).collect(Collectors.toList());
+        return jdbi.withExtension(JdbiDaoPerson.class, dao -> dao.getAll()).stream().map(b -> b.build()).collect(Collectors.toList());
     }
-
 
     @Override
     public Model.Person update(Model.Person in) {
@@ -72,9 +91,9 @@ class IntegDaoImpl implements IntegDao {
 
         if (isValidForUpdate) {//update
             if (Objects.nonNull(addrId)) {
-                personId = jdbi.withExtension(JdbiDao.person.class, dao -> dao.update(in, addrId));
+                personId = jdbi.withExtension(JdbiDaoPerson.class, dao -> dao.update(in, addrId));
             } else {
-                personId = jdbi.withExtension(JdbiDao.person.class, dao -> dao.update(in));
+                personId = jdbi.withExtension(JdbiDaoPerson.class, dao -> dao.update(in));
             }
         } else {
             throw new UnsupportedOperationException("NO DML, why is control coming here? Hint: Did you forget to set mandatory fields for Person obj? =" + in + "\n====================================");
@@ -92,7 +111,7 @@ class IntegDaoImpl implements IntegDao {
     @Override
     public Model.Person recordIntentXref(Model.Person in, Subsys subsysType) {
         if (in.hasId() && Objects.nonNull(subsysType)) {
-            jdbi.withExtension(JdbiDao.xref.class, dao -> dao.recordIntentPersonXref(Long.valueOf(in.getId()), subsysType.toString()));
+            jdbi.withExtension(JdbiDaoPersonXref.class, dao -> dao.recordIntentPersonXref(Long.valueOf(in.getId()), subsysType.toString()));
         }
         return in;
     }
@@ -100,7 +119,7 @@ class IntegDaoImpl implements IntegDao {
     @Override
     public Long create(Model.Xref in) {
         if (in.hasId() && in.hasXrefSystemId()){
-            return jdbi.withExtension(JdbiDao.xref.class, dao -> dao.insert(in));
+            return jdbi.withExtension(JdbiDaoPersonXref.class, dao -> dao.insert(in));
         }else{
             throw new RuntimeException("Invalid Xref to save, must have master_id & subsystem_id");
         }
@@ -108,31 +127,25 @@ class IntegDaoImpl implements IntegDao {
 
     // ---- Case  ---
     @Override
-    public Optional<Model.Case> getCase(String id) {
-        System.out.println("Dao get case for id="+ id);
+    public Optional<Model.Case> getCase(Long id) {
+        System.out.println("Dao get case for id=" + id);
         Long idLong = Long.valueOf(id);
-        var optPerson = jdbi.withExtension(JdbiDao.acase.class, dao -> dao.get(idLong));
-        return optPerson.map(b-> b.build());
+        var optPerson = jdbi.withExtension(JdbiDaoCase.class, dao -> dao.get(idLong));
+        return optPerson.map(b -> b.build());
     }
+
     public List<Model.Case> getRecentCases() {
-        return jdbi.withExtension(JdbiDao.acase.class, dao -> dao.getAll()).stream().map(b -> b.build()).collect(Collectors.toList());
+        return jdbi.withExtension(JdbiDaoCase.class, dao -> dao.getAll()).stream().map(b -> b.build()).collect(Collectors.toList());
     }
+
     @Override
     public Long create(Model.Case in) {
-        boolean isValidForInsert = DataQuality.Case.isValidForInsert(in);
-        if (!isValidForInsert)
-            throw new UnsupportedOperationException("NOT valid for insert, why is control coming here? Hint: Did you forget to set mandatory fields for Person obj? =" + in + "\n================================");
-        //1. Save the address.
-        Long addrId = null;//forPersonInsertOrUpdateAddress(in);
+        DataQuality.Case.isValidForInsert(in);
+        //1. NO Save the address - assume address already in db
+        //Long addrId = forCaseInsertOrUpdateAddress(in);
 
-        //2. Save person details - FN, LN, email
-        Long id ;
-        if (Objects.nonNull(addrId)) { // addr inserted
-            //id = jdbi.withExtension(JdbiDao.acase.class, dao -> dao.insert(in, addrId));
-            throw new UnsupportedOperationException("Address insert not supported");
-        } else {
-            id = jdbi.withExtension(JdbiDao.acase.class, dao -> dao.insert(in));
-        }
+        //2. Save Case details - FN, LN, email
+        Long id = jdbi.withExtension(JdbiDaoCase.class, dao -> dao.insert(in));
 
         //3. Save intentions on SS-accounts in INTEG_XREF
         //forPersonInsertOrUpdateXref(personId, in); //XREF are inserted in integService,
@@ -141,54 +154,29 @@ class IntegDaoImpl implements IntegDao {
     }
 
     @Override
-    public Model.Case update(Model.Case in) {
-        //check address
-        Long addrId = null;//forPersonInsertOrUpdateAddress(in);//TODO watch : may add 'duplicate' address
-        boolean isValidForUpdate = DataQuality.Case.isValidForUpdate(in);
-        Long id = null;
-
-        if (isValidForUpdate) {//update
-            if (Objects.nonNull(addrId)) {
-                //id = jdbi.withExtension(JdbiDao.acase.class, dao -> dao.update(in, addrId));
-            } else {
-                id = jdbi.withExtension(JdbiDao.acase.class, dao -> dao.update(in));
-            }
-        } else {
-            throw new UnsupportedOperationException("NO DML, why is control coming here? Hint: Did you forget to set mandatory fields for Person obj? =" + in + "\n====================================");
-        }
-        //forPersonInsertOrUpdateXref(personId, in);
-        System.out.println("At integdaoimpl case="+in.getId());
-        var opt = getCase(in.getId());
-        return opt.isPresent() ? opt.get() : null;
-    }
-
-    @Override
     public Model.Case recordIntentXref(Model.Case in, Subsys subsysType) {
         return null;
     }
 
+    @Override
+    public Model.Case update(Model.Case in) {
+        //check address
+        Long addrId = null;//forPersonInsertOrUpdateAddress(in);//TODO watch : may add 'duplicate' address
 
-    // ---- Helper functions ---
-    //update xref in Person object //Note: PersonXref are inserted in IntegServiceImpl, and deactivated in other mechanism
-    // NO UPDATE for XREF_PERSON !
-    /*
-    private void forPersonInsertOrUpdateXref(final Long masterPersonId, Model.Person in) {
-        Stream<Model.Xref> insertable = in.getXrefAccountsMap().values().stream().filter(x -> isInsertable(x));
-        Stream<Model.Xref> updatable = in.getXrefAccountsMap().values().stream().filter(x -> !isInsertable(x));
+        DataQuality.Case.isValidForUpdate(in);
 
-        insertable.forEach(xref -> jdbi.withExtension(JdbiDao.xref.class, dao -> dao.insert(masterPersonId, xref)));
-        updatable.forEach(xref -> jdbi.withExtension(JdbiDao.xref.class, dao -> dao.update(masterPersonId, xref)));
-
-    }*/
-    private static boolean isInsertable(Model.Xref in){
-        if(in.hasXrefId()) {
-            return false; // not insertable
-        }else{
-            return true; // no xrefId filled, so new link to subsystem, so insert.
+        Long id;
+        if (Objects.nonNull(addrId)) {
+            //id = jdbi.withExtension(   JdbiDaoCase.class, dao -> dao.update(in, addrId));
+        } else {
+            System.out.println("before case insert json=\n" + ProtoUtil.toJson(in));
+            id = jdbi.withExtension(JdbiDaoCase.class, dao -> dao.update(in));
         }
 
+        System.out.println("At integdaoimpl case=" + in.getId());
+        var opt = getCase(in.getId());
+        return opt.isPresent() ? opt.get() : null;
     }
-
 
     private Long forPersonInsertOrUpdateAddress(Model.Person in) {
         final var addrIn = in.getAddress();
@@ -200,10 +188,10 @@ class IntegDaoImpl implements IntegDao {
         boolean isValidForUpdate = DataQuality.Address.isValidForUpdate(addrIn);
         if (in.hasAddress()) {
             if (isValidForInsert) {
-                return jdbi.withExtension(JdbiDao.address.class, dao -> dao.insert(addrIn));
+                return jdbi.withExtension(JdbiDaoPerson.address.class, dao -> dao.insert(addrIn));
 
             } else if (isValidForUpdate) {
-                return jdbi.withExtension(JdbiDao.address.class, dao -> dao.update(addrIn));
+                return jdbi.withExtension(JdbiDaoPerson.address.class, dao -> dao.update(addrIn));
             } else if (DataQuality.Address.isValidForeignKeyRef(addrIn)) {
                 //check if addr id  exist in db
                 // if not exist, throw error!
@@ -216,7 +204,7 @@ class IntegDaoImpl implements IntegDao {
                 } else {
                     return id.get();
                 }
-                //jdbi.withExtension(JdbiDao.class, dao -> {
+                //jdbi.withExtension(JdbiDaoPerson.class, dao -> {
                 //    dao.hasAddress(addrIn.getId())
                 //});
             } else {

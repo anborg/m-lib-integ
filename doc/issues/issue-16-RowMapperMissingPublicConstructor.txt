@@ -5,10 +5,10 @@ Error ;
 
 java.lang.reflect.UndeclaredThrowableException
 	at com.sun.proxy.$Proxy28.get(Unknown Source)
-	at integ.dao.jdbi.TestJdbiDao.lambda$testDao_CRUD$2(TestJdbiDao.java:54)
+	at integ.dao.jdbi.TestJdbiDaoPerson.lambda$testDao_CRUD$2(TestJdbiDao.java:54)
 	at org.jdbi.v3.core.Jdbi.callWithExtension(Jdbi.java:475)
 	at org.jdbi.v3.core.Jdbi.withExtension(Jdbi.java:462)
-	at integ.dao.jdbi.TestJdbiDao.testDao_CRUD(TestJdbiDao.java:41)
+	at integ.dao.jdbi.TestJdbiDaoPerson.testDao_CRUD(TestJdbiDao.java:41)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -111,10 +111,10 @@ Caused by: java.lang.IllegalAccessException: no such constructor: muni.model.Mod
 	at org.jdbi.v3.sqlobject.internal.SqlObjectInitData$1.invoke(SqlObjectInitData.java:125)
 	at org.jdbi.v3.sqlobject.SqlObjectFactory.lambda$attach$2(SqlObjectFactory.java:110)
 	at com.sun.proxy.$Proxy29.insert(Unknown Source)
-	at integ.dao.jdbi.TestJdbiDao.lambda$testDao_CRUD$1(TestJdbiDao.java:44)
+	at integ.dao.jdbi.TestJdbiDaoPerson.lambda$testDao_CRUD$1(TestJdbiDao.java:44)
 	at org.jdbi.v3.core.Jdbi.callWithExtension(Jdbi.java:475)
 	at org.jdbi.v3.core.Jdbi.withExtension(Jdbi.java:457)
-	at integ.dao.jdbi.TestJdbiDao.lambda$testDao_CRUD$2(TestJdbiDao.java:43)
+	at integ.dao.jdbi.TestJdbiDaoPerson.lambda$testDao_CRUD$2(TestJdbiDao.java:43)
 	... 68 more
 Caused by: java.lang.IllegalAccessError: class org.jdbi.v3.core.mapper.reflect.internal.BeanPropertiesFactory$BeanPojoProperties$PropertiesHolder tried to access private method muni.model.Model$PostalAddress.<init>()V (org.jdbi.v3.core.mapper.reflect.internal.BeanPropertiesFactory$BeanPojoProperties$PropertiesHolder and muni.model.Model$PostalAddress are in unnamed module of loader 'app')
 	at java.base/java.lang.invoke.MethodHandleNatives.resolve(Native Method)

@@ -14,7 +14,7 @@ class RowMapperPerson implements RowMapper<Model.Person.Builder> {
     @Override
     public Model.Person.Builder map(ResultSet rs, StatementContext ctx) throws SQLException {
         Model.Person.Builder pb = Model.Person.newBuilder();
-        String id = "" + rs.getInt("p_id");
+        Long id = rs.getLong("p_id");
         System.out.println("Retrieved person id : " + id);
         if (null == id) return null;//TODO make not of this nul return.
         //build person

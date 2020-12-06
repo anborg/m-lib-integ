@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface IntegService {
     Model.Person create(Model.Person in);
 
-    Optional<Model.Person> getPerson(String id);
+    Optional<Model.Person> getPerson(Long id);
 
     List<Model.Person> personsRecent();
 
@@ -22,10 +22,8 @@ public interface IntegService {
     Model.Person recordIntentXref(Model.Person in, Subsys subsysType);
 
 
+    Optional<Model.Case> getCase(Long id);
 
-
-
-    Optional<Model.Case> getCase(String id);
     Model.Case create(Model.Case in);
 
     Model.Case update(Model.Case in);

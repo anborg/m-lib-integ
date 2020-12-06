@@ -3,6 +3,7 @@ package access.integ;
 
 import muni.model.Model;
 import muni.service.SubsystemService;
+import muni.util.MockUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -55,11 +56,11 @@ class IntegServiceImpl implements IntegService {
                 .collect(Collectors.toList());
         for (Model.Xref xref : toCreate) {
             try {// Call Amanda  / Hansen
-                Subsys subsys = Subsys.getValueOf(xref.getXrefSystemId());
-                var service = getSubsystemService(xref.getXrefSystemId());
-                var xrefPerson = service.person().create(in);
+                Subsys subsys = Subsys.getValueOf(xref.getXrefSystemId()); //AMANDA
+                var subsystemService = getSubsystemService(xref.getXrefSystemId()); //AmandaService
+                var xrefPerson = subsystemService.person().create(in);
                 var xrefWithId = Model.Xref.newBuilder()
-                        .setId("" + personMasterId)
+                        .setId(personMasterId)
                         .setXrefSystemId(xref.getXrefSystemId())//Was a bug here.
                         .setXrefId(xrefPerson.getId()).build();
                 Long id = integDao.create(xrefWithId);
@@ -70,14 +71,14 @@ class IntegServiceImpl implements IntegService {
                 throw e;
             }
         }
-        Model.Person out = integDao.get("" + personMasterId).get();//Once saved, assumed "guaranteed" return
+        Model.Person out = integDao.get(personMasterId).get();//Once saved, assumed "guaranteed" return
         return out;
     }
 
     @Override
-    public Optional<Model.Person> getPerson(String id) {
+    public Optional<Model.Person> getPerson(Long id) {
         System.out.println("At integServiceImpl person id=" + id);
-        Optional<Model.Person> out = integDao.get((id));//Long.valueOf
+        Optional<Model.Person> out = integDao.get(id);//Long.valueOf
         System.out.println("At integServiceImpl pers=" + out);
         return out;
     }
@@ -156,12 +157,13 @@ class IntegServiceImpl implements IntegService {
 
 
     @Override
-    public Optional<Model.Case> getCase(String id) {
+    public Optional<Model.Case> getCase(Long id) {
         System.out.println("At integServiceImpl case id=" + id);
         Optional<Model.Case> out = integDao.getCase(id);//Long.valueOf
         System.out.println("At integServiceImpl case=" + out);
         return out;
     }
+
     @Override
     public List<Model.Case> casesRecent() {
         return integDao.getRecentCases();
@@ -169,8 +171,43 @@ class IntegServiceImpl implements IntegService {
 
     @Override
     public Model.Case create(Model.Case in) {
-        //Person  - create: save Person name/address
-        return null;
+        //Case must have preexisting: reportedByCustomer & address, if not set default
+
+        Model.Case.Builder caseB = Model.Case.newBuilder(in);
+        if (!in.hasReportedByCustomer() || !in.getReportedByCustomer().hasId()) {
+            caseB.setReportedByCustomer(MockUtil.buildOrgAnonPerson());
+        }
+        if (!in.hasAddress() || !in.getAddress().hasId()) {
+            caseB.setAddress(MockUtil.buildOrgAnonAddress());
+        }
+
+
+        Long personMasterId = integDao.create(caseB.build());
+
+        //4. TODO Command-SS to create those accounts - api calls
+        //5. TODO Update SS-personId to subbaccounts in INTEG_XREF
+        List<Model.Xref> toCreate = in.getXrefsMap().values().stream()
+                .filter(xref -> xref.hasXrefId() == false) // subsystem not called.
+                .collect(Collectors.toList());
+        for (Model.Xref xref : toCreate) {
+            try {// Call Amanda  / Hansen
+//                Subsys subsys = Subsys.getValueOf(xref.getXrefSystemId());
+//                var subsystemService = getSubsystemService(xref.getXrefSystemId());
+//                var xrefCase = subsystemService.ccase().create(in);
+//                var xrefWithId = Model.Xref.newBuilder()
+//                        .setId("" + personMasterId)
+//                        .setXrefSystemId(xref.getXrefSystemId())//Was a bug here.
+//                        .setXrefId(xrefCase.getId()).build();
+//                Long id = integDao.create(xrefWithId);
+//                System.out.println("Xref inserted id=" + id);
+            } catch (Exception e) {
+                //TODO if call to subsystem fails, just ignore, as a backend thread may handle it.
+                System.out.println(e.getMessage());
+                throw e;
+            }
+        }
+        Model.Case out = integDao.getCase(personMasterId).get();//Once saved, assumed "guaranteed" return
+        return out;
     }
 
     @Override

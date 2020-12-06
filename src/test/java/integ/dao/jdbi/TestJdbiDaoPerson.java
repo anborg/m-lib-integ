@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 @SuppressWarnings("deprecation")
-public class TestJdbiDao {
+public class TestJdbiDaoPerson {
 
 
 //    String url3 = "jdbc:h2:mem:testdb;INIT=CREATE SCHEMA IF NOT EXISTS INTEG\\;SET SCHEMA INTEG\\;";
@@ -25,7 +25,7 @@ public class TestJdbiDao {
     }
 
     @Test
-    public void testDao_CRUD() {
+    public void person_CRUD() {
 
         final var pi_addr = Model.PostalAddress.newBuilder().setStreetNum("111").setStreetName("My street").setCity("Avenly").setPostalCode("L1L0Z0").build();
         final var p1_xref_amanda = Model.Xref.newBuilder().setXrefSystemId(Subsys.AMANDA.toString()).build();
@@ -41,16 +41,16 @@ public class TestJdbiDao {
         final var p3 = Model.Person.newBuilder().setFirstName("Delete").setLastName("Me").setEmail("me@gmail.com").build();
         Jdbi jdbi = buildJdbi();
         //start clean
-        jdbi.useExtension(JdbiDao.person.class, dao -> dao.deleteAll());
+        jdbi.useExtension(JdbiDaoPerson.class, dao -> dao.deleteAll());
         //when
-        List<Model.Person.Builder> personsB = jdbi.withExtension(JdbiDao.person.class, persDao -> {
+        List<Model.Person.Builder> personsB = jdbi.withExtension(JdbiDaoPerson.class, persDao -> {
             //insert - address
-            Long id_ofP1_a1 = jdbi.withExtension(JdbiDao.address.class, addrDao -> addrDao.insert(p1.getAddress()));
+            Long id_ofP1_a1 = jdbi.withExtension(JdbiDaoPerson.address.class, addrDao -> addrDao.insert(p1.getAddress()));
 
             System.out.println("Addr id id_ofP1_a1=" + id_ofP1_a1);
             //insert - person with address
             Long id_ofP1 = persDao.insert(p1, id_ofP1_a1);
-            Long id_ofP1_xamanda = jdbi.withExtension(JdbiDao.xref.class, xrefDao -> xrefDao.insert(id_ofP1, p1_xref_amanda));
+            Long id_ofP1_xamanda = jdbi.withExtension(JdbiDaoPersonXref.class, xrefDao -> xrefDao.insert(id_ofP1, p1_xref_amanda));
 
             //insert - person without address
             Long id_ofP2 = persDao.insert(p2);
@@ -80,15 +80,12 @@ public class TestJdbiDao {
                     .extracting(Model.PostalAddress::getStreetNum, Model.PostalAddress::getStreetName, Model.PostalAddress::getPostalCode, Model.PostalAddress::getCity, Model.PostalAddress::getCountry, Model.PostalAddress::getLat, Model.PostalAddress::getLon)
                     .containsExactly(pi_addr.getStreetNum(), pi_addr.getStreetName(), pi_addr.getPostalCode(), pi_addr.getCity(), pi_addr.getCountry(), pi_addr.getLat(), pi_addr.getLon());
             //check - addr generic inserted obj looks like.
-            assertThat(p1_addr_fromdb.getId()).isNotEmpty();
-            assertThat(p1_addr_fromdb.getId()).isNotNull();
-            assertThat(p1_addr_fromdb.getId()).containsOnlyDigits();
+            assertThat(p1_addr_fromdb.getId()).isNotNull().isNotNegative();
+            //assertThat(p1_addr_fromdb.getId()).containsOnlyDigits();
             assertThat(p1_addr_fromdb.hasCreateTime()).isTrue();
             assertThat(p1_addr_fromdb.hasUpdateTime()).isTrue();
             //check - person generic inserted obj looks like.
-            assertThat(p1_fromdb.getId()).isNotEmpty();
-            assertThat(p1_fromdb.getId()).isNotNull();
-            assertThat(p1_fromdb.getId()).containsOnlyDigits();
+            assertThat(p1_fromdb.getId()).isNotNull().isNotNegative();
             assertThat(p1_fromdb.hasCreateTime()).isTrue();
             assertThat(p1_fromdb.hasUpdateTime()).isTrue();
 

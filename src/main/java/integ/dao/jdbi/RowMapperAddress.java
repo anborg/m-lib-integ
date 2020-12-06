@@ -17,7 +17,7 @@ class RowMapperAddress implements RowMapper<Model.PostalAddress.Builder> {
     public Model.PostalAddress.Builder map(ResultSet rs, StatementContext ctx) throws SQLException {
         final Model.PostalAddress.Builder ab = Model.PostalAddress.newBuilder();
         //build address
-        String address_id = rs.getString("a_id");
+        Long address_id = rs.getLong("a_id");
         if (null == address_id) return null;//TODO make not of this nul return.
         if (Objects.nonNull(address_id)) {
             String streetNum = rs.getString("a_streetnum");

@@ -66,7 +66,7 @@ class IntegSubsystemServiceImpl implements SubsystemService {
         }
 
         @Override
-        public Optional<Model.Person> get(String id) {
+        public Optional<Model.Person> get(Long id) {
             System.out.println("At integServiceImpl person id=" + id);
             Optional<Model.Person> out = daoPers.get(Long.valueOf(id));
             System.out.println("At integServiceImpl pers=" + out);
@@ -106,7 +106,7 @@ class IntegSubsystemServiceImpl implements SubsystemService {
         }
 
         @Override
-        public Optional<Model.PostalAddress> get(String id) {
+        public Optional<Model.PostalAddress> get(Long id) {
             System.out.println("At integServiceImpl person id=" + id);
             Optional<Model.PostalAddress> out = dao.get(Long.valueOf(id));
             System.out.println("At integServiceImpl pers=" + out);
@@ -146,7 +146,7 @@ class IntegSubsystemServiceImpl implements SubsystemService {
         }
 
         @Override
-        public Optional<Model.Case> get(String id) {
+        public Optional<Model.Case> get(Long id) {
             return Optional.empty();
         }
 

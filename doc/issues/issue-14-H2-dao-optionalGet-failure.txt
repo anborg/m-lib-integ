@@ -15,7 +15,7 @@ dbproductname=H2
 Addr id id_ofP1_a1=1
 
 Oct 14, 2020 3:09:31 PM org.junit.platform.launcher.core.TestExecutionListenerRegistry lambda$notifyEach$1
-WARNING: TestExecutionListener [com.intellij.junit5.JUnit5TestExecutionListener] threw exception for method: executionFinished(TestIdentifier [uniqueId = '[engine:junit-jupiter]/[class:integ.dao.jdbi.TestJdbiDao]/[method:testDao_CRUD()]', parentId = '[engine:junit-jupiter]/[class:integ.dao.jdbi.TestJdbiDao]', displayName = 'testDao_CRUD()', legacyReportingName = 'testDao_CRUD()', source = MethodSource [className = 'integ.dao.jdbi.TestJdbiDao', methodName = 'testDao_CRUD', methodParameterTypes = ''], tags = [], type = TEST], TestExecutionResult [status = FAILED, throwable = org.jdbi.v3.core.statement.UnableToCreateStatementException@4bd2f0dc])
+WARNING: TestExecutionListener [com.intellij.junit5.JUnit5TestExecutionListener] threw exception for method: executionFinished(TestIdentifier [uniqueId = '[engine:junit-jupiter]/[class:integ.dao.jdbi.TestJdbiDaoPerson]/[method:testDao_CRUD()]', parentId = '[engine:junit-jupiter]/[class:integ.dao.jdbi.TestJdbiDaoPerson]', displayName = 'testDao_CRUD()', legacyReportingName = 'testDao_CRUD()', source = MethodSource [className = 'integ.dao.jdbi.TestJdbiDaoPerson', methodName = 'testDao_CRUD', methodParameterTypes = ''], tags = [], type = TEST], TestExecutionResult [status = FAILED, throwable = org.jdbi.v3.core.statement.UnableToCreateStatementException@4bd2f0dc])
 java.lang.RuntimeException: Generated message class "muni.model.Model$Person" missing method "getCreateTimeCase".
 	at com.google.protobuf.GeneratedMessageV3.getMethodOrDie(GeneratedMessageV3.java:1847)
 	at com.google.protobuf.GeneratedMessageV3.access$1000(GeneratedMessageV3.java:79)

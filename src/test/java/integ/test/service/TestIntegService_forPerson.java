@@ -5,13 +5,12 @@ import access.integ.IntegUtil;
 import access.integ.Subsys;
 import muni.model.Model;
 import muni.util.DataQuality;
-import muni.util.MockUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestIntegService {
+public class TestIntegService_forPerson {
 
     IntegService service;
 
@@ -21,14 +20,14 @@ public class TestIntegService {
         service = IntegUtil.mock();
     }
 
-    public Model.Person createCustomer() { // Tests create and get
-        Model.Person c1 = Model.Person.newBuilder().setFirstName("Bob").setLastName("Fork").build();
-        final var c1_created = service.create(c1);
-        return c1_created;
-    }
+//    public Model.Person createCustomer() { // Tests create and get
+//        Model.Person c1 = Model.Person.newBuilder().setFirstName("Bob").setLastName("Fork").build();
+//        final var c1_created = service.create(c1);
+//        return c1_created;
+//    }
 
     @Test
-    public void crud_person_noaddr_shouldPass() {
+    public void person_crud_noaddr() {
         Model.Person c1_new = Model.Person.newBuilder().setFirstName("Bob").setLastName("Fork").setEmail("bob@gmail.com").build();
         //valid?
         assertThat(DataQuality.Person.isValidForInsert(c1_new)).isTrue();
@@ -97,10 +96,4 @@ public class TestIntegService {
     }
 
 
-    //    @Test
-    public void createCase() {
-        Model.Case mycase = MockUtil.buildCase();
-        final var createdCase = service.create(mycase);
-        //System.out.println(createdCase);
-    }
 }
