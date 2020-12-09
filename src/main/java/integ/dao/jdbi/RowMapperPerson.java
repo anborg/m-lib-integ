@@ -23,6 +23,7 @@ class RowMapperPerson implements RowMapper<Model.Person.Builder> {
         String email = rs.getString("p_email");
         String phone1 = rs.getString("p_phone1");
         String phone2 = rs.getString("p_phone2");
+        //Timestamps are guaranteed to be in db.
         var ts_create = Timestamps.fromSeconds(rs.getTimestamp("p_ts_create").toInstant().getEpochSecond());
         var ts_update = Timestamps.fromSeconds(rs.getTimestamp("p_ts_update").toInstant().getEpochSecond());
 
