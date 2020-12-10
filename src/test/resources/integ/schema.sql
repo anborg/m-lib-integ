@@ -45,30 +45,30 @@ CREATE TABLE INTEG_XREF_PERSON ( -- contact_channels.postalAddress
 ;
 
 
-insert into INTEG_ADDRESS (id, streetnum, streetname, city, country, postalcode) values
- ( 0,'1001', 'Anon St', 'My City', 'Canada', '000 000') -- if someone does not give address, use this
-,( 1,'1001', 'Owner Oganization St', 'My City', '', 'L1L0Z0') -- if address need to be validated later (emergency), use this
-,( 2,'1002', 'My Street', 'My City', 'Canada', 'L1L0Z0')
-,( 3,'1003', 'My Street', 'My City', 'Canada', 'L1L0Z0')
-,( 6,'1', 'North Pole St', 'Antarctica', 'Canada', 'OoO0Z0')
+insert into INTEG_ADDRESS (id, streetnum, streetname, city, country, postalcode, ts_create, ts_update) values
+ ( 0,'1001', 'Anon St', 'My City', 'Canada', '000 000', TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP) -- if someone does not give address, use this
+,( 1,'1001', 'Owner Oganization St', 'My City', '', 'L1L0Z0', TIMESTAMP '2020-09-01 14:22:11.871-05:00',CURRENT_TIMESTAMP) -- if address need to be validated later (emergency), use this
+,( 2,'1002', 'My Street', 'My City', 'Canada', 'L1L0Z0',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
+,( 3,'1003', 'My Street', 'My City', 'Canada', 'L1L0Z0', CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
+,( 6,'1', 'North Pole St', 'Antarctica', 'Canada', 'OoO0Z0', CURRENT_TIMESTAMP, TIMESTAMP '2020-09-01 14:23:12.871-05:00')
 ;
 
 
-insert into INTEG_PERSON (id, firstname, lastname, email, phone1, phone2, address_id) values
-(0, 'Anon', 'Doe', 'anon@gmail.com', null, null,0)
-,(1, 'OrgAnon', 'Person', 'admin@myorg.com',null, null,1)
-,(2, 'Rat', 'Atouee', 'ratatouee@gmail.com', '2222222222', '999999999',2)
-,(3, 'Richard', 'Seter', 'my.richy@gmail.com', '3333333333', '999999999',3)
-,(4, 'Cyber', 'Johney', 'cyber.pcc@anon.oc', null, null, null)
-,(5, 'Anamica', 'Caller', null, '55555555', null, null)
-,(6, 'Stonage', 'Frostboy', null, null, null, 6)
+insert into INTEG_PERSON (id, firstname, lastname, email, phone1, phone2, address_id, ts_create, ts_update) values
+(0, 'Anon', 'Doe', 'anon@gmail.com', null, null,0, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,(1, 'OrgAnon', 'Person', 'admin@myorg.com',null, null,1, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,(2, 'Rat', 'Atouee', 'ratatouee@gmail.com', '2222222222', '999999999',2, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,(3, 'Richard', 'Seter', 'my.richy@gmail.com', '3333333333', '999999999',3, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,(4, 'Cyber', 'Johney', 'cyber.pcc@anon.oc', null, null, null, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,(5, 'Anamica', 'Caller', null, '55555555', null, null, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,(6, 'Stonage', 'Frostboy', null, null, null, 6, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
 ;
 
-insert into INTEG_XREF_PERSON (id, xref_sys_id, xref_id) values
-( 1,'AMANDA', null)
-,( 1,'HANSEN', null)
-,( 2,'AMANDA', null)
-,( 3,'HANSEN', null)
+insert into INTEG_XREF_PERSON (id, xref_sys_id, xref_id, ts_create, ts_update) values
+( 1,'AMANDA', null,TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 1,'HANSEN', null,TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 2,'AMANDA', null,TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 3,'HANSEN', null,TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
 ;
 commit;
 
@@ -115,27 +115,27 @@ CREATE TABLE INTEG_XREF_CASE ( -- contact_channels.postalAddress
 )
 ;
 
-insert into INTEG_CASE_ADDRESS (id, streetnum, streetname, city, country, postalcode) values
- ( 0,'1001', 'Anon St', 'My City', 'Canada', '000 000') -- if someone does not give address, use this
-,( 1,'1001', 'Owner Oganization St', 'My City', '', 'L1L0Z0') -- if address need to be validated later (emergency), use this
-,( 2,'1002', 'My Street', 'My City', 'Canada', 'L1L0Z0')
-,( 3,'1003', 'My Street', 'My City', 'Canada', 'L1L0Z0')
-,( 6,'1', 'North Pole St', 'Antarctica', 'Canada', 'OoO0Z0')
+insert into INTEG_CASE_ADDRESS (id, streetnum, streetname, city, country, postalcode, ts_create, ts_update) values
+ ( 0,'1001', 'Anon St', 'My City', 'Canada', '000 000',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP) -- if someone does not give address, use this
+,( 1,'1001', 'Owner Oganization St', 'My City', '', 'L1L0Z0',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP) -- if address need to be validated later (emergency), use this
+,( 2,'1002', 'My Street', 'My City', 'Canada', 'L1L0Z0',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 3,'1003', 'My Street', 'My City', 'Canada', 'L1L0Z0',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 6,'1', 'North Pole St', 'Antarctica', 'Canada', 'OoO0Z0',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
 ;
 
 -- AI_TRIAGE, AWAIT_TRIAGE, PENDING_INTERNAL, PENDING_EXTERNAL, TASKS_DONE, CLOSED, REOPENED
-insert into INTEG_CASE (id, status, type_id,reportedby_person_id,createdby_emp_id,address_id,description) values
-( 1,'AWAIT_TRIAGE', 'WATER_PIPE', 1, 'rose', 1,'Water pipe leak, inside house')
-,( 2,'AWAIT_TRIAGE', 'COMPLAINT', 1, 'rose', 0,'Neigbor just lookin at me')
-,( 3,'AWAIT_TRIAGE', 'TREE', 1, 'rose', 1,'Tree in intersection xstree/ystreet blocking pedestrian walk')
-,( 4,'AWAIT_TRIAGE', 'INFO', 0, 'rose', 0,'Habibi, I forgot my name .. what is it?')
+insert into INTEG_CASE (id, status, type_id,reportedby_person_id,createdby_emp_id,address_id,description, ts_create,ts_update) values
+( 1,'AWAIT_TRIAGE', 'WATER_PIPE', 1, 'rose', 1,'Water pipe leak, inside house',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 2,'AWAIT_TRIAGE', 'COMPLAINT', 1, 'rose', 0,'Neigbor just lookin at me',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 3,'AWAIT_TRIAGE', 'TREE', 1, 'rose', 1,'Tree in intersection xstree/ystreet blocking pedestrian walk',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 4,'AWAIT_TRIAGE', 'INFO', 0, 'rose', 0,'Habibi, I forgot my name .. what is it?',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
 ;
 
-insert into INTEG_XREF_CASE (id, xref_sys_id, xref_id) values
-( 1,'AMANDA', null)
-,( 1,'HANSEN', null)
-,( 2,'AMANDA', null)
-,( 3,'HANSEN', null)
+insert into INTEG_XREF_CASE (id, xref_sys_id, xref_id,ts_create) values
+( 1,'AMANDA', null,TIMESTAMP '2020-09-01 14:22:11.871-05:00')
+,( 1,'HANSEN', null,TIMESTAMP '2020-09-01 14:22:11.871-05:00')
+,( 2,'AMANDA', null,TIMESTAMP '2020-09-01 14:22:11.871-05:00')
+,( 3,'HANSEN', null,TIMESTAMP '2020-09-01 14:22:11.871-05:00')
 ;
 commit;
 drop table if exists integ.INTEG_CASE_PROPS_LOOKUP;
