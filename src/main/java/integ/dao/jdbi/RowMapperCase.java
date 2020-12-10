@@ -13,7 +13,7 @@ import java.util.Optional;
 class RowMapperCase implements RowMapper<Model.Case.Builder> {
     @Override
     public Model.Case.Builder map(ResultSet rs, StatementContext ctx) throws SQLException {
-        Model.Case.Builder pb = Model.Case.newBuilder();
+        Model.Case.Builder cb = Model.Case.newBuilder();
         Long id = rs.getLong("c_id");
         System.out.println("Retrieved case id : " + id);
         if (null == id) return null;//TODO make not of this nul return.
@@ -24,23 +24,23 @@ class RowMapperCase implements RowMapper<Model.Case.Builder> {
         String createdby_emp_id = rs.getString("c_createdby_emp_id");
         String address_id = rs.getString("c_address_id");
         String description = rs.getString("c_description");
-
+        //Timestamps are guaranteed to be in db.
         var ts_create = Timestamps.fromSeconds(rs.getTimestamp("c_ts_create").toInstant().getEpochSecond());
         var ts_update = Timestamps.fromSeconds(rs.getTimestamp("c_ts_update").toInstant().getEpochSecond());
 
-        Optional.ofNullable(id).ifPresent(pb::setId);
-        Optional.ofNullable(status).ifPresent(pb::setStatus);
-        Optional.ofNullable(type_id).ifPresent(pb::setTypeId);
+        Optional.ofNullable(id).ifPresent(cb::setId);
+        Optional.ofNullable(status).ifPresent(cb::setStatus);
+        Optional.ofNullable(type_id).ifPresent(cb::setTypeId);
 //        Optional.ofNullable(reportedby_person_id).ifPresent(pb:);
 //        Optional.ofNullable(createdby_emp_id).ifPresent(pb::setCreatedByEmployee);
         //if (Objects.nonNull(address_id)) Optional.ofNullable(ab.build()).ifPresent(pb::setAddress); //handled in Reducer.
-        Optional.ofNullable(description).ifPresent(pb::setDescription);
+        Optional.ofNullable(description).ifPresent(cb::setDescription);
 
         //pb.putXrefAccounts() // handled in reducer
-        Optional.ofNullable(ts_create).ifPresent(pb::setCreateTime);
-        Optional.ofNullable(ts_update).ifPresent(pb::setUpdateTime);
+        Optional.ofNullable(ts_create).ifPresent(cb::setCreateTime);
+        Optional.ofNullable(ts_update).ifPresent(cb::setUpdateTime);
+        System.out.println("Case timestamp :" + ts_create  );
 
-
-        return pb;
+        return cb;
     }
 }//mapper

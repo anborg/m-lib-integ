@@ -1,0 +1,11 @@
+
+Find what makes person/case different.
+- lib-integ?
+- restjson?
+
+
+Case ts changing, should not :http://localhost:8082/mkapp/rest/v1/cases/1
+{
+  "createTime": "2020-12-08T17:12:22.200Z",
+  "updateTime": "2020-12-08T17:12:22.200Z",
+  "id": "1",

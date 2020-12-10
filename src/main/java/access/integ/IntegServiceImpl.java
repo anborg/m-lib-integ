@@ -136,7 +136,7 @@ class IntegServiceImpl implements IntegService {
                 case HANSEN:
                     //subsysPerson = hanService.create(in);//call hansen lib
                 default:
-                    throw new UnsupportedOperationException("Subsystm id not expected");
+                    throw new UnsupportedOperationException("Subsystm id not expected ss="+subsysType);
             }
         } catch (UnsupportedOperationException e) {
             throw e; // only wrong subsysId need to be
