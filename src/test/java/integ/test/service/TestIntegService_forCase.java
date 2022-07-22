@@ -108,7 +108,7 @@ public class TestIntegService_forCase {
 
         //verify
         //verify lastname in integ obj
-        assertThat(integPerson_fromdb).extracting(Model.Person::getLastName).containsExactly(updatedLastName);
+        assertThat(integPerson_fromdb).extracting(Model.Person::getLastName).as(updatedLastName);
 
         //verify lastname propagated to all subsystems
         for (var xref : integPerson_fromdb.getXrefsMap().values()) {

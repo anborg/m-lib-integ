@@ -37,8 +37,6 @@ class RowMapperPerson implements RowMapper<Model.Person.Builder> {
         //pb.putXrefAccounts() // handled in reducer
         Optional.ofNullable(ts_create).ifPresent(pb::setCreateTime);
         Optional.ofNullable(ts_update).ifPresent(pb::setUpdateTime);
-
-
         return pb;
     }
 }//mapper

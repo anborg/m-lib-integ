@@ -1,3 +1,6 @@
+-- one person
+-- one address
+-- many subsystems where same person need to be.
 select
    p.id p_id,
    p.firstname p_firstname,

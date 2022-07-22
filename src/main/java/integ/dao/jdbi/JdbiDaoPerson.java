@@ -41,22 +41,22 @@ interface JdbiDaoPerson {//extends CRUDDao<Model.Person>
     @GetGeneratedKeys
     @SqlUpdate("insert into INTEG_PERSON(firstname, lastname, email, phone1, phone2) VALUES ( :firstName, :lastName, :email, :phone1, :phone2 )")
 // RETURNING id
-        Long insert(@BindBean Model.Person in);
+    Long insert(@BindBean Model.Person in);
 
-        @Transactional
-        @GetGeneratedKeys
-        @SqlUpdate("insert into INTEG_PERSON(firstname, lastname, email, phone1, phone2, address_id) VALUES ( :firstName, :lastName, :email, :phone1, :phone2, :addressId )")
+    @Transactional
+    @GetGeneratedKeys
+    @SqlUpdate("insert into INTEG_PERSON(firstname, lastname, email, phone1, phone2, address_id) VALUES ( :firstName, :lastName, :email, :phone1, :phone2, :addressId )")
 // RETURNING id
-        Long insert(@BindBean Model.Person in, @Bind("addressId") Long addressId);
+    Long insert(@BindBean Model.Person in, @Bind("addressId") Long addressId);
 
 
-        @GetGeneratedKeys
-        @SqlUpdate("update INTEG_PERSON set firstname=:firstName,lastname=:lastName, email=:email, phone1=:phone1, phone2=:phone2 where id=cast(:id as INTEGER)")
-        Long update(@BindBean Model.Person in);
+    @GetGeneratedKeys
+    @SqlUpdate("update INTEG_PERSON set firstname=:firstName,lastname=:lastName, email=:email, phone1=:phone1, phone2=:phone2 where id=cast(:id as INTEGER)")
+    Long update(@BindBean Model.Person in);
 
-        @GetGeneratedKeys
-        @SqlUpdate("update INTEG_PERSON set firstname=:firstName,lastname=:lastName, email=:email, phone1=:phone1, phone2=:phone2, address_id=:addressId where id=cast(:id as INTEGER)")
-        Long update(@BindBean Model.Person in, @Bind("addressId") Long addressId);
+    @GetGeneratedKeys
+    @SqlUpdate("update INTEG_PERSON set firstname=:firstName,lastname=:lastName, email=:email, phone1=:phone1, phone2=:phone2, address_id=:addressId where id=cast(:id as INTEGER)")
+    Long update(@BindBean Model.Person in, @Bind("addressId") Long addressId);
 
     @Deprecated
     @SqlQuery("select_Persons_top_x")
@@ -66,15 +66,15 @@ interface JdbiDaoPerson {//extends CRUDDao<Model.Person>
     @RegisterBeanMapper(value = Model.PostalAddress.class, prefix = "a")
     @RegisterBeanMapper(value = Model.Xref.class, prefix = "x")
     @Transaction(TransactionIsolationLevel.READ_COMMITTED)
-        List<Model.Person.Builder> getAll();
+    List<Model.Person.Builder> getAll();
 
-        @Deprecated
-        @SqlUpdate("delete from INTEG_PERSON")
-        void deleteAll();
+    @Deprecated
+    @SqlUpdate("delete from INTEG_PERSON")
+    void deleteAll();
 
-        @Deprecated
-        @SqlUpdate("delete from INTEG_PERSON where id = cast(:id as INTEGER )")
-        void delete(@Bind("id") Long id);
+    @Deprecated
+    @SqlUpdate("delete from INTEG_PERSON where id = cast(:id as INTEGER )")
+    void delete(@Bind("id") Long id);
 
     //}
 
@@ -126,8 +126,6 @@ interface JdbiDaoPerson {//extends CRUDDao<Model.Person>
             }
         }
     }//ReducerPersonAddressXref
-
-
 }//JdbiDaoPerson
 
 

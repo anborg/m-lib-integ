@@ -4,7 +4,7 @@ set schema integ;
 
 drop TABLE if exists integ.INTEG_PERSON;
 CREATE TABLE INTEG_PERSON (
-    id  INTEGER  GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) PRIMARY KEY
+    id  INTEGER   GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1)  PRIMARY KEY
     , firstname VARCHAR(30)
     , lastname VARCHAR(30)
     , email VARCHAR(40)
@@ -45,23 +45,23 @@ CREATE TABLE INTEG_XREF_PERSON ( -- contact_channels.postalAddress
 ;
 
 
-insert into INTEG_ADDRESS (id, streetnum, streetname, city, country, postalcode, ts_create, ts_update) values
- ( 0,'1001', 'Anon St', 'My City', 'Canada', '000 000', TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP) -- if someone does not give address, use this
-,( 1,'1001', 'Owner Oganization St', 'My City', '', 'L1L0Z0', TIMESTAMP '2020-09-01 14:22:11.871-05:00',CURRENT_TIMESTAMP) -- if address need to be validated later (emergency), use this
-,( 2,'1002', 'My Street', 'My City', 'Canada', 'L1L0Z0',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
-,( 3,'1003', 'My Street', 'My City', 'Canada', 'L1L0Z0', CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
-,( 6,'1', 'North Pole St', 'Antarctica', 'Canada', 'OoO0Z0', CURRENT_TIMESTAMP, TIMESTAMP '2020-09-01 14:23:12.871-05:00')
+insert into INTEG_ADDRESS (streetnum, streetname, city, country, postalcode, ts_create, ts_update) values
+ ('1001', 'Anon St', 'My City', 'Canada', '000 000', TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP) -- if someone does not give address, use this
+,('1001', 'Owner Oganization St', 'My City', '', 'L1L0Z0', TIMESTAMP '2020-09-01 14:22:11.871-05:00',CURRENT_TIMESTAMP) -- if address need to be validated later (emergency), use this
+,('1002', 'My Street', 'My City', 'Canada', 'L1L0Z0',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
+,('1003', 'My Street', 'My City', 'Canada', 'L1L0Z0', CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
+,('1', 'North Pole St', 'Antarctica', 'Canada', 'OoO0Z0', CURRENT_TIMESTAMP, TIMESTAMP '2020-09-01 14:23:12.871-05:00')
 ;
 
 
-insert into INTEG_PERSON (id, firstname, lastname, email, phone1, phone2, address_id, ts_create, ts_update) values
-(0, 'Anon', 'Doe', 'anon@gmail.com', null, null,0, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
-,(1, 'OrgAnon', 'Person', 'admin@myorg.com',null, null,1, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
-,(2, 'Rat', 'Atouee', 'ratatouee@gmail.com', '2222222222', '999999999',2, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
-,(3, 'Richard', 'Seter', 'my.richy@gmail.com', '3333333333', '999999999',3, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
-,(4, 'Cyber', 'Johney', 'cyber.pcc@anon.oc', null, null, null, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
-,(5, 'Anamica', 'Caller', null, '55555555', null, null, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
-,(6, 'Stonage', 'Frostboy', null, null, null, 6, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+insert into INTEG_PERSON (firstname, lastname, email, phone1, phone2, address_id, ts_create, ts_update) values
+( 'Anon', 'Doe', 'anon@gmail.com', null, null,0, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 'OrgAnon', 'Person', 'admin@myorg.com',null, null,1, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 'Rat', 'Atouee', 'ratatouee@gmail.com', '2222222222', '999999999',2, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 'Richard', 'Seter', 'my.richy@gmail.com', '3333333333', '999999999',3, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 'Cyber', 'Johney', 'cyber.pcc@anon.oc', null, null, null, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 'Anamica', 'Caller', null, '55555555', null, null, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 'Stonage', 'Frostboy', null, null, null, 6, TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
 ;
 
 insert into INTEG_XREF_PERSON (id, xref_sys_id, xref_id, ts_create, ts_update) values
@@ -76,7 +76,7 @@ commit;
 
 drop TABLE if exists INTEG_CASE;
 CREATE TABLE INTEG_CASE (
-    id  INTEGER  GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) PRIMARY KEY
+    id  INTEGER   GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) PRIMARY KEY
     , status VARCHAR(30) -- TRIAGE / PENDING/ DONE
     , type_id VARCHAR(30)
     , reportedby_person_id INTEGER -- to PERSON.id
@@ -89,7 +89,7 @@ CREATE TABLE INTEG_CASE (
 
 drop table if exists integ.INTEG_CASE_ADDRESS;
 CREATE TABLE INTEG_CASE_ADDRESS (
-    id  INTEGER  GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) PRIMARY KEY
+    id  INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) PRIMARY KEY
     , streetnum VARCHAR(10)
     , streetname VARCHAR(30)
     , city VARCHAR(20)
@@ -115,20 +115,20 @@ CREATE TABLE INTEG_XREF_CASE ( -- contact_channels.postalAddress
 )
 ;
 
-insert into INTEG_CASE_ADDRESS (id, streetnum, streetname, city, country, postalcode, ts_create, ts_update) values
- ( 0,'1001', 'Anon St', 'My City', 'Canada', '000 000',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP) -- if someone does not give address, use this
-,( 1,'1001', 'Owner Oganization St', 'My City', '', 'L1L0Z0',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP) -- if address need to be validated later (emergency), use this
-,( 2,'1002', 'My Street', 'My City', 'Canada', 'L1L0Z0',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
-,( 3,'1003', 'My Street', 'My City', 'Canada', 'L1L0Z0',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
-,( 6,'1', 'North Pole St', 'Antarctica', 'Canada', 'OoO0Z0',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+insert into INTEG_CASE_ADDRESS (streetnum, streetname, city, country, postalcode, ts_create, ts_update) values
+ ( '1001', 'Anon St', 'My City', 'Canada', '000 000',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP) -- if someone does not give address, use this
+,( '1001', 'Owner Oganization St', 'My City', '', 'L1L0Z0',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP) -- if address need to be validated later (emergency), use this
+,( '1002', 'My Street', 'My City', 'Canada', 'L1L0Z0',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( '1003', 'My Street', 'My City', 'Canada', 'L1L0Z0',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( '1', 'North Pole St', 'Antarctica', 'Canada', 'OoO0Z0',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
 ;
 
 -- AI_TRIAGE, AWAIT_TRIAGE, PENDING_INTERNAL, PENDING_EXTERNAL, TASKS_DONE, CLOSED, REOPENED
-insert into INTEG_CASE (id, status, type_id,reportedby_person_id,createdby_emp_id,address_id,description, ts_create,ts_update) values
-( 1,'AWAIT_TRIAGE', 'WATER_PIPE', 1, 'rose', 1,'Water pipe leak, inside house',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
-,( 2,'AWAIT_TRIAGE', 'COMPLAINT', 1, 'rose', 0,'Neigbor just lookin at me',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
-,( 3,'AWAIT_TRIAGE', 'TREE', 1, 'rose', 1,'Tree in intersection xstree/ystreet blocking pedestrian walk',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
-,( 4,'AWAIT_TRIAGE', 'INFO', 0, 'rose', 0,'Habibi, I forgot my name .. what is it?',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+insert into INTEG_CASE ( status, type_id,reportedby_person_id,createdby_emp_id,address_id,description, ts_create,ts_update) values
+( 'AWAIT_TRIAGE', 'WATER_PIPE', 1, 'rose', 1,'Water pipe leak, inside house',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 'AWAIT_TRIAGE', 'COMPLAINT', 1, 'rose', 0,'Neigbor just lookin at me',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 'AWAIT_TRIAGE', 'TREE', 1, 'rose', 1,'Tree in intersection xstree/ystreet blocking pedestrian walk',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
+,( 'AWAIT_TRIAGE', 'INFO', 0, 'rose', 0,'Habibi, I forgot my name .. what is it?',TIMESTAMP '2020-09-01 14:22:11.871-05:00', CURRENT_TIMESTAMP)
 ;
 
 insert into INTEG_XREF_CASE (id, xref_sys_id, xref_id,ts_create) values

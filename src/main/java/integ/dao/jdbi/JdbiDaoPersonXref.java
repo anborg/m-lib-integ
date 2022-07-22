@@ -30,18 +30,14 @@ interface JdbiDaoPersonXref {
         @SqlUpdate("insert into INTEG_XREF_PERSON (id, xref_sys_id, xref_id) VALUES ( :id , :xrefSystemId, :xrefId )")
         Long insert(@BindBean Model.Xref in);
 
-
         @Transactional
         @GetGeneratedKeys
         @SqlUpdate("insert into INTEG_XREF_PERSON (id, xref_sys_id) VALUES ( :person_id, :xrefSystemId)")
                 // RETURNING id
         Long recordIntentPersonXref(@Bind("person_id") Long personId, @Bind("subsysId") String xrefSubsysId);
 
-
         @SqlQuery("SELECT id, xref_sys_id, xref_id, ts_create, ts_update,ts_ss_refreshed from INTEG_XREF_PERSON where id = :masterPersonId ")
         @RegisterBeanMapper(RowMapperXref.class)
         @Transaction(TransactionIsolationLevel.READ_COMMITTED)
         List<Model.Xref> getXrefPerson(@Bind("masterPersonId") Long masterPersonId);
-
-
 }

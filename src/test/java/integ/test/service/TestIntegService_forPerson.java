@@ -14,20 +14,13 @@ public class TestIntegService_forPerson {
 
     IntegService service;
 
-
     @BeforeEach
     public void setup() {
         service = IntegUtil.mock();
     }
 
-//    public Model.Person createCustomer() { // Tests create and get
-//        Model.Person c1 = Model.Person.newBuilder().setFirstName("Bob").setLastName("Fork").build();
-//        final var c1_created = service.create(c1);
-//        return c1_created;
-//    }
-
     @Test
-    public void person_crud_noaddr() {
+    public void person_noaddr_shoud_create_and_update_in_db() {
         Model.Person c1_new = Model.Person.newBuilder().setFirstName("Bob").setLastName("Fork").setEmail("bob@gmail.com").build();
         //valid?
         assertThat(DataQuality.Person.isValidForInsert(c1_new)).isTrue();
@@ -42,7 +35,7 @@ public class TestIntegService_forPerson {
         //System.out.println("updated: " + c1_Updated); //TODO document soprint is triggering xxCase() NoSuchMethod.
         //assertThat(c1_Updated).isSameAs(c1_ToUpdate); //TODO document isSameAs is triggering Caused by: java.lang.NoSuchMethodException: muni.model.Model$Person.getCreateTimeCase()
         assertThat(c1_Updated).extracting(Model.Person::getLastName)
-                .containsExactly(c1_ToUpdate.getLastName());
+                .as(c1_ToUpdate.getLastName());
     }
 
     @Test
@@ -50,10 +43,10 @@ public class TestIntegService_forPerson {
         var amdXref = Model.Xref.newBuilder().setXrefSystemId(Subsys.AMANDA.toString()).build();
         var hansenXref = Model.Xref.newBuilder().setXrefSystemId(Subsys.HANSEN.toString()).build();
         Model.Person c1_new = Model.Person.newBuilder()
-                .setFirstName("Bob").setLastName("Fork")
+                .setFirstName("Bob").setLastName("Fork") //Person info
                 .setEmail("bob@gmail.com")
-                .putXrefs(amdXref.getXrefSystemId(), amdXref)
-                .putXrefs(hansenXref.getXrefSystemId(), hansenXref)
+                .putXrefs(amdXref.getXrefSystemId(), amdXref) //This person is needed in subsystem-1
+                .putXrefs(hansenXref.getXrefSystemId(), hansenXref) ////This person is needed in subsystem-2
                 .build();
         //valid?
         assertThat(DataQuality.Person.isValidForInsert(c1_new)).isTrue();
@@ -63,14 +56,14 @@ public class TestIntegService_forPerson {
         //check person fields
         assertThat(c1_fromdb).extracting(Model.Person::getFirstName, Model.Person::getLastName, Model.Person::getEmail)
                 .containsExactly(c1_new.getFirstName(), c1_new.getLastName(), c1_new.getEmail());
-        //check xref
+        //check xref - Entty is present in subsystem 1 & 2
         var amdXref_fromdb = c1_fromdb.getXrefsMap().get(amdXref.getXrefSystemId());
         assertThat(amdXref_fromdb).isNotNull();
         assertThat(amdXref_fromdb).extracting(Model.Xref::getXrefSystemId, Model.Xref::getId, Model.Xref::getXrefId)
                 .containsExactly(amdXref.getXrefSystemId(), c1_fromdb.getId(), amdXref_fromdb.getXrefId());
         assertThat(amdXref_fromdb.getXrefId()).isNotNull();
 
-        //Verofu update
+        //Veroify update
         update_and_verify(c1_fromdb);
 
     }
@@ -83,11 +76,11 @@ public class TestIntegService_forPerson {
 
         //verify
         //verify lastname in integ obj
-        assertThat(integPerson_fromdb).extracting(Model.Person::getLastName).containsExactly(updatedLastName);
+        assertThat(integPerson_fromdb).extracting(Model.Person::getLastName).as(updatedLastName);
 
         //verify lastname propagated to all subsystems
         for (var xref : integPerson_fromdb.getXrefsMap().values()) {
-            var xrefPerson = service.getSubsystemPerson(xref).get();
+            var xrefPerson = service.getSubsystemPerson(xref).get(); //e.g amandaPerson, hansenPerson...
             assertThat(xrefPerson).as("Verify Person updates in xref system=" + xref.getXrefSystemId())
                     .extracting(Model.Person::getId, Model.Person::getLastName)
                     .containsExactly(xref.getXrefId(), updatedLastName);
