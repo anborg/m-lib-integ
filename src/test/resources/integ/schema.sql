@@ -81,7 +81,7 @@ CREATE TABLE INTEG_CASE (
     , type_id VARCHAR(30)
     , reportedby_person_id INTEGER -- to PERSON.id
     , createdby_emp_id VARCHAR(10) -- employee userid
-    , address_id INTEGER -- address id, must be within markham jurisdiction.
+    , address_id INTEGER -- address id, must be within org jurisdiction.
     , description VARCHAR(200) not null
     , ts_create TIMESTAMP  DEFAULT CURRENT_TIMESTAMP
     , ts_update TIMESTAMP  DEFAULT CURRENT_TIMESTAMP -- ON UPDATE CURRENT_TIMESTAMP
