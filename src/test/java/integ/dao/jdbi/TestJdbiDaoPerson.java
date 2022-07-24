@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,6 +16,7 @@ import static org.assertj.core.api.Assertions.tuple;
 
 @SuppressWarnings("deprecation")
 public class TestJdbiDaoPerson {
+    private static Logger logger = Logger.getLogger(TestJdbiDaoPerson.class.getName());
 
 
 //    String url3 = "jdbc:h2:mem:testdb;INIT=CREATE SCHEMA IF NOT EXISTS INTEG\\;SET SCHEMA INTEG\\;";
@@ -47,7 +49,7 @@ public class TestJdbiDaoPerson {
             //insert - address
             Long id_ofP1_a1 = jdbi.withExtension(JdbiDaoPerson.address.class, addrDao -> addrDao.insert(p1.getAddress()));
 
-            System.out.println("Addr id id_ofP1_a1=" + id_ofP1_a1);
+            logger.info("Addr id id_ofP1_a1=" + id_ofP1_a1);
             //insert - person with address
             Long id_ofP1 = persDao.insert(p1, id_ofP1_a1);
             Long id_ofP1_xamanda = jdbi.withExtension(JdbiDaoPersonXref.class, xrefDao -> xrefDao.insert(id_ofP1, p1_xref_amanda));
@@ -55,7 +57,7 @@ public class TestJdbiDaoPerson {
             //insert - person without address
             Long id_ofP2 = persDao.insert(p2);
             Long id_ofP3 = persDao.insert(p3);
-            System.out.println(id_ofP1 + ", " + id_ofP2 + ", " + id_ofP3);
+            logger.info(id_ofP1 + ", " + id_ofP2 + ", " + id_ofP3);
             final Optional<Model.Person.Builder> p1Select = persDao.get(id_ofP1);
             //check - inserted object is in db
             assertThat(p1Select.isPresent()).isTrue();
@@ -110,7 +112,7 @@ public class TestJdbiDaoPerson {
                         tuple(p2.getFirstName(), "Dummy")
                 );
 
-        //System.out.println(persons);
+        //logger.info(persons);
 
     }
 }//testjdbc

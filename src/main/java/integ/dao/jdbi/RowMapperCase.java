@@ -8,14 +8,16 @@ import org.jdbi.v3.core.statement.StatementContext;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 //mapper -- THe order of building may need to follow this standard pattern.
 class RowMapperCase implements RowMapper<Model.Case.Builder> {
+    private static Logger logger = Logger.getLogger(RowMapperCase.class.getName());
     @Override
     public Model.Case.Builder map(ResultSet rs, StatementContext ctx) throws SQLException {
         Model.Case.Builder cb = Model.Case.newBuilder();
         Long id = rs.getLong("c_id");
-        System.out.println("Retrieved case id : " + id);
+        logger.info("Retrieved case id : " + id);
         if (null == id) return null;//TODO make not of this nul return.
         //build person
         String status = rs.getString("c_status");
@@ -39,7 +41,7 @@ class RowMapperCase implements RowMapper<Model.Case.Builder> {
         //pb.putXrefAccounts() // handled in reducer
         Optional.ofNullable(ts_create).ifPresent(cb::setCreateTime);
         Optional.ofNullable(ts_update).ifPresent(cb::setUpdateTime);
-        System.out.println("Case timestamp :" + ts_create  );
+        logger.info("Case timestamp :" + ts_create  );
 
         return cb;
     }

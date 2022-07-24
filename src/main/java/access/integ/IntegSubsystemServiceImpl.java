@@ -6,6 +6,7 @@ import muni.service.SubsystemService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 /**
  * This was an attept to have IntegService to also follow same interface as subsystemservice.
@@ -13,6 +14,7 @@ import java.util.Optional;
  */
 @Deprecated
 class IntegSubsystemServiceImpl implements SubsystemService {
+    private static Logger logger = Logger.getLogger(IntegSubsystemServiceImpl.class.getName());
     PersonDA personDA;
     AddressDA addressDA;
     CaseDA caseDA;
@@ -67,9 +69,9 @@ class IntegSubsystemServiceImpl implements SubsystemService {
 
         @Override
         public Optional<Model.Person> get(Long id) {
-            System.out.println("At integServiceImpl person id=" + id);
+            logger.info("At integServiceImpl person id=" + id);
             Optional<Model.Person> out = daoPers.get(Long.valueOf(id));
-            System.out.println("At integServiceImpl pers=" + out);
+            logger.info("At integServiceImpl pers=" + out);
             return out;
         }
 
@@ -107,9 +109,9 @@ class IntegSubsystemServiceImpl implements SubsystemService {
 
         @Override
         public Optional<Model.PostalAddress> get(Long id) {
-            System.out.println("At integServiceImpl person id=" + id);
+            logger.info("At integServiceImpl person id=" + id);
             Optional<Model.PostalAddress> out = dao.get(Long.valueOf(id));
-            System.out.println("At integServiceImpl pers=" + out);
+            logger.info("At integServiceImpl pers=" + out);
             return out;
         }
 

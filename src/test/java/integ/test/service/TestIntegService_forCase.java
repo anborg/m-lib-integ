@@ -10,10 +10,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestIntegService_forCase {
+    private static Logger logger = Logger.getLogger(TestIntegService_forCase.class.getName());
 
     IntegService service;
 
@@ -63,7 +65,7 @@ public class TestIntegService_forCase {
         //valid for update
         //assertThat(DataQuality.Case.isValidForUpdate(c1_ToUpdate)).isTrue();
         final var c1_Updated = service.update(c1_ToUpdate);
-        //System.out.println("updated: " + c1_Updated); //TODO document soprint is triggering xxCase() NoSuchMethod.
+        //logger.info("updated: " + c1_Updated); //TODO document soprint is triggering xxCase() NoSuchMethod.
         //assertThat(c1_Updated).isSameAs(c1_ToUpdate); //TODO document isSameAs is triggering Caused by: java.lang.NoSuchMethodException: muni.model.Model$Person.getCreateTimeCase()
         assertThat(c1_Updated).extracting(Model.Case::getId, Model.Case::getStatus)
                 .containsExactly(c1_fromdb.getId(), c1_ToUpdate.getStatus());

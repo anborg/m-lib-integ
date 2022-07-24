@@ -9,8 +9,10 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.util.logging.Logger;
 
 public class JdbiDbUtil {
+    private static Logger logger = Logger.getLogger(JdbiDbUtil.class.getName());
     private static void common(Jdbi jdbi) {
         jdbi.installPlugin(new SqlObjectPlugin())
                 //common mappers
@@ -27,7 +29,7 @@ public class JdbiDbUtil {
         try (Connection con = ds.getConnection()) {
             dbmeta = con.getMetaData();
             final var dbProductName = dbmeta.getDatabaseProductName();
-            System.out.println("dbproductname=" + dbProductName);
+            logger.info("dbproductname=" + dbProductName);
             switch (dbProductName) {
                 case "PostgreSQL":
                     jdbi.installPlugin(new PostgresPlugin());

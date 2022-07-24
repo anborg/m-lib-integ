@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
  * Implements integ service.
  */
 class IntegServiceImpl implements IntegService {
-
+    private static Logger logger = Logger.getLogger(IntegServiceImpl.class.getName());
     IntegDao integDao;
 
     Map<Subsys, SubsystemService> serviceMap = new HashMap<>();
@@ -64,10 +65,10 @@ class IntegServiceImpl implements IntegService {
                         .setXrefSystemId(xref.getXrefSystemId())//Was a bug here.
                         .setXrefId(xrefPerson.getId()).build();
                 Long id = integDao.create(xrefWithId);
-                System.out.println("Xref inserted id=" + id);
+                logger.info("Xref inserted id=" + id);
             } catch (Exception e) {
                 //TODO if call to subsystem fails, just ignore, as a backend thread may handle it.
-                System.out.println(e.getMessage());
+                logger.info(e.getMessage());
                 throw e;
             }
         }
@@ -77,9 +78,9 @@ class IntegServiceImpl implements IntegService {
 
     @Override
     public Optional<Model.Person> getPerson(Long id) {
-        System.out.println("At integServiceImpl person id=" + id);
+        logger.info("At integServiceImpl person id=" + id);
         Optional<Model.Person> out = integDao.get(id);//Long.valueOf
-        System.out.println("At integServiceImpl pers=" + out);
+        logger.info("At integServiceImpl pers=" + out);
         return out;
     }
 
@@ -103,7 +104,7 @@ class IntegServiceImpl implements IntegService {
 
     @Override
     public Model.Person update(Model.Person in) {
-        System.out.println("at integsvcImpl update id="+ in.getId());
+        logger.info("at integsvcImpl update id="+ in.getId());
         var persUpdated = integDao.update(in);
 
         for(var xref: in.getXrefsMap().values()){
@@ -158,9 +159,9 @@ class IntegServiceImpl implements IntegService {
 
     @Override
     public Optional<Model.Case> getCase(Long id) {
-        System.out.println("At integServiceImpl case id=" + id);
+        logger.info("At integServiceImpl case id=" + id);
         Optional<Model.Case> out = integDao.getCase(id);//Long.valueOf
-        System.out.println("At integServiceImpl case=" + out);
+        logger.info("At integServiceImpl case=" + out);
         return out;
     }
 
@@ -199,10 +200,10 @@ class IntegServiceImpl implements IntegService {
 //                        .setXrefSystemId(xref.getXrefSystemId())//Was a bug here.
 //                        .setXrefId(xrefCase.getId()).build();
 //                Long id = integDao.create(xrefWithId);
-//                System.out.println("Xref inserted id=" + id);
+//                logger.info("Xref inserted id=" + id);
             } catch (Exception e) {
                 //TODO if call to subsystem fails, just ignore, as a backend thread may handle it.
-                System.out.println(e.getMessage());
+                logger.info(e.getMessage());
                 throw e;
             }
         }
@@ -212,7 +213,7 @@ class IntegServiceImpl implements IntegService {
 
     @Override
     public Model.Case update(Model.Case in) {
-        System.out.println("at integsvcImpl update id="+ in.getId());
+        logger.info("at integsvcImpl update id="+ in.getId());
         var caseUpdated = integDao.update(in);
 
         for(var xref: in.getXrefsMap().values()){

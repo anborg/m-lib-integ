@@ -8,10 +8,12 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestIntegDaoImpl {
+    private static Logger logger = Logger.getLogger(TestIntegDaoImpl.class.getName());
 //    static IntegDao dao= null;
     static IntegDao dao  = new IntegDaoImpl(JdbiDbUtil.withDbPlugin(IntegUtil.inmemDS()));
 
@@ -40,7 +42,7 @@ public class TestIntegDaoImpl {
     @Test
     public void person_nonexistant_get_id() {
         Optional<Model.Person> opt = dao.get(9999L);
-        System.out.println(opt);
+        logger.info(opt.toString());
         assertThat(opt.isPresent()).isFalse();
     }
 
@@ -49,7 +51,7 @@ public class TestIntegDaoImpl {
         Optional<Model.Person> opt = dao.get(1L);
         assertThat(opt.isPresent()).isTrue();
 //        final var p = opt.get();
-//        System.out.println(p.toString());
+//        logger.info(p.toString());
 //        assertThat(p.hasAddress()).isFalse();
     }
 

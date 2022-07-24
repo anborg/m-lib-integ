@@ -32,7 +32,7 @@ public class TestIntegService_forPerson {
         //valid for update
         assertThat(DataQuality.Person.isValidForUpdate(c1_ToUpdate)).isTrue();
         final var c1_Updated = service.update(c1_ToUpdate);
-        //System.out.println("updated: " + c1_Updated); //TODO document soprint is triggering xxCase() NoSuchMethod.
+        //logger.info("updated: " + c1_Updated); //TODO document soprint is triggering xxCase() NoSuchMethod.
         //assertThat(c1_Updated).isSameAs(c1_ToUpdate); //TODO document isSameAs is triggering Caused by: java.lang.NoSuchMethodException: muni.model.Model$Person.getCreateTimeCase()
         assertThat(c1_Updated).extracting(Model.Person::getLastName)
                 .as(c1_ToUpdate.getLastName());

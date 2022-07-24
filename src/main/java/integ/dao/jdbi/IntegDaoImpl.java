@@ -10,9 +10,11 @@ import org.jdbi.v3.core.Jdbi;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 class IntegDaoImpl implements IntegDao {
+    private Logger logger = Logger.getLogger(IntegDaoImpl.class.getName());
     Jdbi jdbi;
 
     public IntegDaoImpl(Jdbi jdbi) {
@@ -72,7 +74,7 @@ class IntegDaoImpl implements IntegDao {
 
     @Override
     public Optional<Model.Person> get(Long id) {
-        System.out.println("Dao get person for id=" + id);
+        logger.info("Dao get person for id=" + id);
 //        Long idLong = Long.valueOf(id);
         var optPerson = jdbi.withExtension(JdbiDaoPerson.class, dao -> dao.get(id));
         return optPerson.map(b -> b.build());
@@ -99,7 +101,7 @@ class IntegDaoImpl implements IntegDao {
             throw new UnsupportedOperationException("NO DML, why is control coming here? Hint: Did you forget to set mandatory fields for Person obj? =" + in + "\n====================================");
         }
         //forPersonInsertOrUpdateXref(personId, in);
-        System.out.println("At integdaoimpl pid="+in.getId());
+        logger.info("At integdaoimpl pid="+in.getId());
         var opt = get(in.getId());
         return opt.isPresent() ? opt.get() : null;
 
@@ -128,7 +130,7 @@ class IntegDaoImpl implements IntegDao {
     // ---- Case  ---
     @Override
     public Optional<Model.Case> getCase(Long id) {
-        System.out.println("Dao get case for id=" + id);
+        logger.info("Dao get case for id=" + id);
         Long idLong = Long.valueOf(id);
         var optPerson = jdbi.withExtension(JdbiDaoCase.class, dao -> dao.get(idLong));
         return optPerson.map(b -> b.build());
@@ -169,11 +171,11 @@ class IntegDaoImpl implements IntegDao {
         if (Objects.nonNull(addrId)) {
             //id = jdbi.withExtension(   JdbiDaoCase.class, dao -> dao.update(in, addrId));
         } else {
-            System.out.println("before case insert json=\n" + ProtoUtil.toJson(in));
+            logger.info("before case insert json=\n" + ProtoUtil.toJson(in));
             id = jdbi.withExtension(JdbiDaoCase.class, dao -> dao.update(in));
         }
 
-        System.out.println("At integdaoimpl case=" + in.getId());
+        logger.info("At integdaoimpl case=" + in.getId());
         var opt = getCase(in.getId());
         return opt.isPresent() ? opt.get() : null;
     }
@@ -181,7 +183,7 @@ class IntegDaoImpl implements IntegDao {
     private Long forPersonInsertOrUpdateAddress(Model.Person in) {
         final var addrIn = in.getAddress();
         if (!in.hasAddress()) {
-            System.out.println("No Address to insert");
+            logger.info("No Address to insert");
             return null;
         }
         boolean isValidForInsert = DataQuality.Address.isValidForInsert(addrIn);

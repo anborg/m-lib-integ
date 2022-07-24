@@ -8,14 +8,16 @@ import org.jdbi.v3.core.statement.StatementContext;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 //mapper -- THe order of building may need to follow this standard pattern.
 class RowMapperPerson implements RowMapper<Model.Person.Builder> {
+    private static Logger logger = Logger.getLogger(RowMapperPerson.class.getName());
     @Override
     public Model.Person.Builder map(ResultSet rs, StatementContext ctx) throws SQLException {
         Model.Person.Builder pb = Model.Person.newBuilder();
         Long id = rs.getLong("p_id");
-        System.out.println("Retrieved person id : " + id);
+        logger.info("Retrieved person id : " + id);
         if (null == id) return null;//TODO make not of this nul return.
         //build person
         String firstName = rs.getString("p_firstname");

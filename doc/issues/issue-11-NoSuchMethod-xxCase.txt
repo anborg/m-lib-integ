@@ -1,5 +1,5 @@
 Error Trigger:
- - Error Triggered by System.OUt.println( <proto3 object that has optional-field >
+ - Error Triggered by logger.info( <proto3 object that has optional-field >
     - Avoid print.
  - at  assertThat(<p3-obj>).sameAs(<<p3-obj>>)
    - use assertThat(<p3-obj>).extracting(field1, field2)
