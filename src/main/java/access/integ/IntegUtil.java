@@ -50,7 +50,13 @@ public class IntegUtil {
         String INMEM_DB_URL = "jdbc:h2:mem:;" +
                 "INIT=RUNSCRIPT FROM 'classpath:integ/schema.sql'\\;" +
                 "RUNSCRIPT FROM 'classpath:integ/data.sql'";
+
+        String INMEM_REACTIVE_DB_URL = "r2dbc:h2:mem:;" +
+                "INIT=RUNSCRIPT FROM 'classpath:integ/schema.sql'\\;" +
+                "RUNSCRIPT FROM 'classpath:integ/data.sql'";
         return INMEM_DB_URL;
+
+
     }
 
     final static Random random = new Random();
